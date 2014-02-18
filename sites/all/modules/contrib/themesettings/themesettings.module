@@ -1,0 +1,996 @@
+<?php
+
+/**
+ * @file
+ * Customizes the teaser's read more and comments links.
+ */
+
+/**
+ * Modify the node to allow customization of read more, comments, etc.
+ *
+ * Implementation of hook_nodepi().
+ *
+ * @param $node
+ *   The node the action is being performed on.
+ * @param $op
+ *   What kind of action is being performed.
+ * @param $teaser
+ *   Whether to display the teaser only, as on the main page.
+ * @param $page
+ *   Whether the node is being displayed by itself as a page.
+ * @return
+ *   The "load" operation should return an array containing pairs of
+ *   fields => values to be merged into the node object. Otherwise, void.
+ */
+function themesettings_nodeapi(&$node, $op, $teaser, $page) {
+  switch ($op) {
+    case 'view':
+      // Save this information to be used during link_alter hook.
+      $node->display_teaser = $teaser;
+      break;
+
+    // Append the 'Read more' link to the content
+    case 'rss item':
+      if ($teaser && $node->readmore) {
+        // Turn off read more flag for RSS items.
+        $node->readmore = FALSE;
+        $rss_teaser = TRUE;
+      }
+      // Allow 'rss item' case to continue through 'alter' case.
+    case 'alter':
+      // Get current settings
+      global $theme_key;
+      $settings = _themesettings_get_settings($theme_key);
+      // Determine the node type
+      $readmore_node_type = $settings["ts_{$node->type}_readmore_enabled"] ? $node->type : 'default';
+      // Create the link
+      if (isset($rss_teaser) || $teaser && $node->readmore && $settings["ts_{$readmore_node_type}_readmore_placement"] != 'links') {
+        $link = _themesettings_link(
+                  t($settings["ts_{$readmore_node_type}_readmore_prefix"]),
+                  t($settings["ts_{$readmore_node_type}_readmore_suffix"]),
+                  t($settings["ts_{$readmore_node_type}_readmore"]),
+                  "node/$node->nid",
+                  array('title' => t($settings["ts_{$readmore_node_type}_readmore_title"])),
+                  NULL,
+                  NULL,
+                  ($op == 'rss item')  // Use an absolute link if it's an RSS item.
+                );
+      }
+      else {
+        $link = '';
+      }
+
+      // Optionally prepend or append the comments links
+      if (module_exists('comment')) {
+        $comment_node_type = $settings["ts_{$node->type}_comment_enabled"] ? $node->type : 'default';
+        if ($op != 'rss item' && $teaser && $settings["ts_{$comment_node_type}_comment_teaser_placement"] != 'links') {
+          $all = comment_num_all($node->nid);
+          if ($all) {
+            $comment_link = _themesettings_link(
+                              t($settings["ts_{$comment_node_type}_comment_prefix"]),
+                              t($settings["ts_{$comment_node_type}_comment_suffix"]),
+                              format_plural($all,
+                                            $settings["ts_{$comment_node_type}_comment_singular"],
+                                            $settings["ts_{$comment_node_type}_comment_plural"]
+                                           ),
+                              "node/$node->nid",
+                              array('title' => t($settings["ts_{$comment_node_type}_comment_title"])),
+                              NULL,
+                              'comments'
+                            );
+            $new = comment_num_new($node->nid);
+            if ($new) {
+              $comment_link .= _themesettings_link(
+                                 t($settings["ts_{$comment_node_type}_comment_new_prefix"]),
+                                 t($settings["ts_{$comment_node_type}_comment_new_suffix"]),
+                                 format_plural($new,
+                                               $settings["ts_{$comment_node_type}_comment_new_singular"],
+                                               $settings["ts_{$comment_node_type}_comment_new_plural"]
+                                              ),
+                                 "node/$node->nid",
+                                 array('title' => t($settings["ts_{$comment_node_type}_comment_new_title"])),
+                                 NULL,
+                                 'new'
+                               );
+            }
+          }
+          elseif (!$settings["ts_{$comment_node_type}_comment_add_disable"]) {
+            $comment_link = _themesettings_link(
+                              t($settings["ts_{$comment_node_type}_comment_add_prefix"]),
+                              t($settings["ts_{$comment_node_type}_comment_add_suffix"]),
+                              t($settings["ts_{$comment_node_type}_comment_add"]),
+                              "comment/reply/$node->nid",
+                              array('title' => t($settings["ts_{$comment_node_type}_comment_add_title"])),
+                              NULL,
+                              'comment-form'
+                            );
+          }
+          if (isset($comment_link)) {
+            if ($settings["ts_{$comment_node_type}_comment_teaser_placement"] == 'prepend') {
+              $link = $comment_link . $link;
+            }
+            else {
+              $link .= $comment_link;
+            }
+          }
+        }
+      }
+
+      if ($link) {
+        switch ($settings["ts_{$readmore_node_type}_readmore_placement"]) {
+          // Append to end of last paragraph
+          case 'inline':
+            $original = $node->teaser;
+            // The regex <!--[^>]*--> is not perfect, since <!-- hello>world --> is a valid comment
+            $node->teaser = preg_replace(
+                              '~((\s|<!--[^>]*-->|</p>|</div>)+)$~D',
+                              ' <span class="read-more">' . $link . '</span>$1',
+                              $node->teaser);
+            if ($node->teaser != $original) {
+              break;
+            }
+            // Otherwise, we skip a 'break' and fall through to next method
+          // Append separate paragraph
+          case 'append':
+            $node->teaser .= '<p class="read-more">' . $link . '</p>';
+            break;
+        }
+      }
+      break;
+  }
+}
+
+/**
+ * Implementation of hook_link_alter().
+ *
+ * @param $node
+ *   A node object for editing links on.
+ * @param $links
+ *   Nested array of links for the node.
+ * @return
+ *   void
+ */
+function themesettings_link_alter(&$links, $node) {
+
+  // Get current settings
+  global $theme_key;
+  $settings = _themesettings_get_settings($theme_key);
+
+  // Determine the node type
+  $readmore_node_type = $settings["ts_{$node->type}_readmore_enabled"] ? $node->type : 'default';
+  $comment_node_type  = $settings["ts_{$node->type}_comment_enabled"] ? $node->type : 'default';
+
+  if ($node->display_teaser && $node->readmore) {
+    // If the Read more link will be added to the content, turn off the Readmore link
+    if ($settings["ts_{$readmore_node_type}_readmore_placement"] != 'links') {
+      unset($links['node_read_more']);
+    }
+    // If the Read more link is present, optionally turn off Comment add link
+    if ($settings["ts_{$comment_node_type}_comment_add_disable"]) {
+      unset($links['comment_add']);
+    }
+  }
+  // If the Comments link will be added to the content (append/prepend to read more), turn off links
+  if ($node->display_teaser && $settings["ts_{$comment_node_type}_comment_teaser_placement"] != 'links') {
+    unset($links['comment_comments']);
+    unset($links['comment_new_comments']);
+    unset($links['comment_add']);
+  }
+
+  // Read more link
+  if (isset($links['node_read_more'])) {
+    $links['node_read_more'] = array(
+      'title' => _themesettings_link(
+                   t($settings["ts_{$readmore_node_type}_readmore_prefix"]),
+                   t($settings["ts_{$readmore_node_type}_readmore_suffix"]),
+                   t($settings["ts_{$readmore_node_type}_readmore"]),
+                   "node/$node->nid",
+                   array('title' => t($settings["ts_{$readmore_node_type}_readmore_title"]))
+                 ),
+      'html' => TRUE,
+    );
+  }
+
+  // Comments link
+  if (module_exists('comment') && isset($links['comment_comments'])) {
+    $all = comment_num_all($node->nid);
+    $links['comment_comments'] = array(
+      'title' => _themesettings_link(
+                   t($settings["ts_{$comment_node_type}_comment_prefix"]),
+                   t($settings["ts_{$comment_node_type}_comment_suffix"]),
+                   format_plural($all,
+                                 $settings["ts_{$comment_node_type}_comment_singular"],
+                                 $settings["ts_{$comment_node_type}_comment_plural"]
+                                ),
+                   "node/$node->nid",
+                   array('title' => t($settings["ts_{$comment_node_type}_comment_title"])),
+                   NULL,
+                   'comments'
+                 ),
+      'html' => TRUE,
+    );
+  }
+  if (isset($links['comment_new_comments'])) {
+    $new = comment_num_new($node->nid);
+    $links['comment_new_comments'] = array(
+      'title' => _themesettings_link(
+                   t($settings["ts_{$comment_node_type}_comment_new_prefix"]),
+                   t($settings["ts_{$comment_node_type}_comment_new_suffix"]),
+                   format_plural($new,
+                                 $settings["ts_{$comment_node_type}_comment_new_singular"],
+                                 $settings["ts_{$comment_node_type}_comment_new_plural"]
+                                ),
+                   "node/$node->nid",
+                   array('title' => t($settings["ts_{$comment_node_type}_comment_new_title"])),
+                   NULL,
+                   'new'
+                 ),
+      'html' => TRUE,
+    );
+  }
+  if (isset($links['comment_add'])) {
+    if ($node->display_teaser) {
+      $links['comment_add'] = array(
+        'title' => _themesettings_link(
+                     t($settings["ts_{$comment_node_type}_comment_add_prefix"]),
+                     t($settings["ts_{$comment_node_type}_comment_add_suffix"]),
+                     t($settings["ts_{$comment_node_type}_comment_add"]),
+                     "comment/reply/$node->nid",
+                     array('title' => t($settings["ts_{$comment_node_type}_comment_add_title"])),
+                     NULL,
+                     'comment-form'
+                   ),
+        'html' => TRUE,
+      );
+    }
+    else {
+      $links['comment_add'] = array(
+        'title' => _themesettings_link(
+                     t($settings["ts_{$comment_node_type}_comment_node_prefix"]),
+                     t($settings["ts_{$comment_node_type}_comment_node_suffix"]),
+                     t($settings["ts_{$comment_node_type}_comment_node"]),
+                     "comment/reply/$node->nid",
+                     array('title' => t($settings["ts_{$comment_node_type}_comment_node_title"])),
+                     NULL,
+                     'comment-form'
+                   ),
+        'html' => TRUE,
+      );
+    }
+  }
+}
+
+/**
+ * Adds customization settings to the themes/settings form.
+ *
+ * Implementation of hook_form_alter().
+ *
+ * @param $form_id
+ *   The id of the form.
+ * @param $form
+ *   An array containing the form elements.
+ * @return
+ *   void
+ */
+function themesettings_form_alter(&$form, $form_state, $form_id) {
+  if ($form_id == 'system_theme_settings' && $form['var']['#value'] == 'theme_settings') {
+    // Grab the default settings first
+    $defaults =& _themesettings_defaults();
+    // Grab the specific theme settings
+    $var = $form['var']['#value'];
+    $settings = _themesettings_get_settings($var);
+
+    $form['buttons']['#weight'] = 1;
+
+    // Read more link settings
+    $form['readmore'] = array(
+      '#type'        => 'fieldset',
+      '#title'       => t('“Read more” link settings'),
+      '#description' => t('Customize the text and placement of the “Read more” link.'),
+      '#collapsible' => TRUE,
+      '#collapsed'   => FALSE,
+    );
+
+    // Comments link settings
+    $form['comment'] = array(
+      '#type'        => 'fieldset',
+      '#title'       => t('“Comment” links settings'),
+      '#description' => t('Customize the text and placement of the “Comment” links.'),
+      '#collapsible' => TRUE,
+      '#collapsed'   => FALSE,
+    );
+
+    // Default settings
+    $form['readmore']['default'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Default settings for any content type'),
+    );
+    $form['readmore']['default']["ts_default_readmore"] = array(
+      '#type'          => 'textfield',
+      '#title'         => t('Link text'),
+      '#default_value' => $settings["ts_default_readmore"],
+      '#description'   => t('HTML is allowed.'),
+    );
+    $form['readmore']['default']["ts_default_readmore_title"] = array(
+      '#type'          => 'textfield',
+      '#title'         => t('Title text (tool tip)'),
+      '#default_value' => $settings["ts_default_readmore_title"],
+      '#description'   => t('Displayed when hovering over link. Plain text only.'),
+    );
+    $form['readmore']['default']["ts_default_readmore_prefix"] = array(
+      '#type'          => 'textfield',
+      '#title'         => t('Prefix'),
+      '#default_value' => $settings["ts_default_readmore_prefix"],
+      '#description'   => t('Text or HTML placed before the link.'),
+    );
+    $form['readmore']['default']["ts_default_readmore_suffix"] = array(
+      '#type'          => 'textfield',
+      '#title'         => t('Suffix'),
+      '#default_value' => $settings["ts_default_readmore_suffix"],
+      '#description'   => t('Text or HTML placed after the link.'),
+    );
+    $form['readmore']['default']["ts_default_readmore_placement"] = array(
+      '#type'          => 'radios',
+      '#title'         => t('Link placement'),
+      '#default_value' => $settings["ts_default_readmore_placement"],
+      '#options'       => array(
+                            'links'  => t('Add to the links (default)'),
+                            'append' => t('Add a paragraph to the teaser'),
+                            'inline' => t('Add a sentence to the last paragraph of the teaser'),
+                          ),
+    );
+    $form['comment']['default'] = array(
+      '#type'        => 'fieldset',
+      '#title'       => t('Default settings for any content type'),
+    );
+    $form['comment']['default']['teaser'] = array(
+      '#type'        => 'fieldset',
+      '#title'       => t('Links when displaying teaser'),
+      '#collapsible' => TRUE,
+      '#collapsed'   => FALSE,
+    );
+    $form['comment']['default']['teaser']['add'] = array(
+      '#type'        => 'fieldset',
+      '#title'       => t('“Add new comment” link'),
+      '#description' => t('The link when there are no comments.'),
+      '#collapsible' => TRUE,
+      '#collapsed'   => TRUE,
+    );
+    $form['comment']['default']['teaser']['add']["ts_default_comment_add"] = array(
+      '#type'          => 'textfield',
+      '#title'         => t('Link text'),
+      '#default_value' => $settings["ts_default_comment_add"],
+      '#description'   => t('HTML is allowed.'),
+    );
+    $form['comment']['default']['teaser']['add']["ts_default_comment_add_title"] = array(
+      '#type'          => 'textfield',
+      '#title'         => t('Title text (tool tip)'),
+      '#default_value' => $settings["ts_default_comment_add_title"],
+      '#description'   => t('Displayed when hovering over link. Plain text only.'),
+    );
+    $form['comment']['default']['teaser']['add']['extra'] = array(
+      '#type'        => 'fieldset',
+      '#title'       => t('Options'),
+      '#collapsible' => TRUE,
+      '#collapsed'   => TRUE,
+    );
+    $form['comment']['default']['teaser']['add']['extra']["ts_default_comment_add_prefix"] = array(
+      '#type'          => 'textfield',
+      '#title'         => t('Prefix'),
+      '#default_value' => $settings["ts_default_comment_add_prefix"],
+      '#description'   => t('Text or HTML placed before the link.'),
+    );
+    $form['comment']['default']['teaser']['add']['extra']["ts_default_comment_add_suffix"] = array(
+      '#type'          => 'textfield',
+      '#title'         => t('Suffix'),
+      '#default_value' => $settings["ts_default_comment_add_suffix"],
+      '#description'   => t('Text or HTML placed after the link.'),
+    );
+    $form['comment']['default']['teaser']['add']['extra']["ts_default_comment_add_disable"] = array(
+      '#type'          => 'checkbox',
+      '#title'         => t('Don’t show this link when “Read more” is present'),
+      '#default_value' => $settings["ts_default_comment_add_disable"],
+    );
+    $form['comment']['default']['teaser']['standard'] = array(
+      '#type'        => 'fieldset',
+      '#title'       => t('“Comments” link'),
+      '#description' => t('The link when there are one or more comments.'),
+      '#collapsible' => TRUE,
+      '#collapsed'   => TRUE,
+    );
+    $form['comment']['default']['teaser']['standard']["ts_default_comment_singular"] = array(
+      '#type'          => 'textfield',
+      '#title'         => t('Link text when there is 1 comment'),
+      '#default_value' => $settings["ts_default_comment_singular"],
+      '#description'   => t('HTML is allowed.'),
+    );
+    $form['comment']['default']['teaser']['standard']["ts_default_comment_plural"] = array(
+      '#type'          => 'textfield',
+      '#title'         => t('Link text when there are multiple comments'),
+      '#default_value' => $settings["ts_default_comment_plural"],
+      '#description'   => t('HTML is allowed. @count will be replaced with the number of comments.'),
+    );
+    $form['comment']['default']['teaser']['standard']["ts_default_comment_title"] = array(
+      '#type'          => 'textfield',
+      '#title'         => t('Title text (tool tip)'),
+      '#default_value' => $settings["ts_default_comment_title"],
+      '#description'   => t('Displayed when hovering over link. Plain text only.'),
+    );
+    $form['comment']['default']['teaser']['standard']['extra'] = array(
+      '#type'        => 'fieldset',
+      '#title'       => t('Options'),
+      '#collapsible' => TRUE,
+      '#collapsed'   => TRUE,
+    );
+    $form['comment']['default']['teaser']['standard']['extra']["ts_default_comment_prefix"] = array(
+      '#type'          => 'textfield',
+      '#title'         => t('Prefix'),
+      '#default_value' => $settings["ts_default_comment_prefix"],
+      '#description'   => t('Text or HTML placed before the link.'),
+    );
+    $form['comment']['default']['teaser']['standard']['extra']["ts_default_comment_suffix"] = array(
+      '#type'          => 'textfield',
+      '#title'         => t('Suffix'),
+      '#default_value' => $settings["ts_default_comment_suffix"],
+      '#description'   => t('Text or HTML placed after the link.'),
+    );
+    $form['comment']['default']['teaser']['new'] = array(
+      '#type'        => 'fieldset',
+      '#title'       => t('“New comments” link'),
+      '#description' => t('The link when there are one or more new comments.'),
+      '#collapsible' => TRUE,
+      '#collapsed'   => TRUE,
+    );
+    $form['comment']['default']['teaser']['new']["ts_default_comment_new_singular"] = array(
+      '#type'          => 'textfield',
+      '#title'         => t('Link text when there is 1 new comment'),
+      '#default_value' => $settings["ts_default_comment_new_singular"],
+      '#description'   => t('HTML is allowed.'),
+    );
+    $form['comment']['default']['teaser']['new']["ts_default_comment_new_plural"] = array(
+      '#type'          => 'textfield',
+      '#title'         => t('Link text when there are multiple new comments'),
+      '#default_value' => $settings["ts_default_comment_new_plural"],
+      '#description'   => t('HTML is allowed. @count will be replaced with the number of comments.'),
+    );
+    $form['comment']['default']['teaser']['new']["ts_default_comment_new_title"] = array(
+      '#type'          => 'textfield',
+      '#title'         => t('Title text (tool tip)'),
+      '#default_value' => $settings["ts_default_comment_new_title"],
+      '#description'   => t('Displayed when hovering over link. Plain text only.'),
+    );
+    $form['comment']['default']['teaser']['new']['extra'] = array(
+      '#type'        => 'fieldset',
+      '#title'       => t('Options'),
+      '#collapsible' => TRUE,
+      '#collapsed'   => TRUE,
+    );
+    $form['comment']['default']['teaser']['new']['extra']["ts_default_comment_new_prefix"] = array(
+      '#type'          => 'textfield',
+      '#title'         => t('Prefix'),
+      '#default_value' => $settings["ts_default_comment_new_prefix"],
+      '#description'   => t('Text or HTML placed before the link.'),
+    );
+    $form['comment']['default']['teaser']['new']['extra']["ts_default_comment_new_suffix"] = array(
+      '#type'          => 'textfield',
+      '#title'         => t('Suffix'),
+      '#default_value' => $settings["ts_default_comment_new_suffix"],
+      '#description'   => t('Text or HTML placed after the link.'),
+    );
+    $form['comment']['default']['teaser']["ts_default_comment_teaser_placement"] = array(
+      '#type'          => 'radios',
+      '#title'         => t('Link placement'),
+      '#default_value' => $settings["ts_default_comment_teaser_placement"],
+      '#options'       => array(
+                            'links'   => t('Add to the links (default)'),
+                            'prepend' => t('Prepend to “Read more” link'),
+                            'append'  => t('Append to “Read more” link'),
+                          ),
+    );
+    $form['comment']['default']['node'] = array(
+      '#type'        => 'fieldset',
+      '#title'       => t('Links when displaying full content'),
+      '#collapsible' => TRUE,
+      '#collapsed'   => FALSE,
+    );
+    $form['comment']['default']['node']['add'] = array(
+      '#type'        => 'fieldset',
+      '#title'       => t('“Add new comment” link'),
+      '#description' => t('The link when the full content is being displayed.'),
+      '#collapsible' => TRUE,
+      '#collapsed'   => TRUE,
+    );
+    $form['comment']['default']['node']['add']["ts_default_comment_node"] = array(
+      '#type'          => 'textfield',
+      '#title'         => t('Link text'),
+      '#default_value' => $settings["ts_default_comment_node"],
+      '#description'   => t('HTML is allowed.'),
+    );
+    $form['comment']['default']['node']['add']["ts_default_comment_node_title"] = array(
+      '#type'          => 'textfield',
+      '#title'         => t('Title text (tool tip)'),
+      '#default_value' => $settings["ts_default_comment_node_title"],
+      '#description'   => t('Displayed when hovering over link. Plain text only.'),
+    );
+    $form['comment']['default']['node']['add']['extra'] = array(
+      '#type'        => 'fieldset',
+      '#title'       => t('Options'),
+      '#collapsible' => TRUE,
+      '#collapsed'   => TRUE,
+    );
+    $form['comment']['default']['node']['add']['extra']["ts_default_comment_node_prefix"] = array(
+      '#type'          => 'textfield',
+      '#title'         => t('Prefix'),
+      '#default_value' => $settings["ts_default_comment_node_prefix"],
+      '#description'   => t('Text or HTML placed before the link.'),
+    );
+    $form['comment']['default']['node']['add']['extra']["ts_default_comment_node_suffix"] = array(
+      '#type'          => 'textfield',
+      '#title'         => t('Suffix'),
+      '#default_value' => $settings["ts_default_comment_node_suffix"],
+      '#description'   => t('Text or HTML placed after the link.'),
+    );
+
+    // Get node-specific settings
+    foreach (node_get_types('names') AS $type => $name) {
+      // Setup a safe type name to use for CSS classes/ids
+      $safe_type = str_replace('_', '-', $type);
+      // Read more
+      $form['readmore']["ts_{$type}_readmore_enabled"] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Enable custom “Read more” link settings for @name', array('@name' => $name)),
+        '#default_value' => $settings["ts_{$type}_readmore_enabled"],
+      );
+      $form['readmore']["{$type}_div_prefix"] = array(
+        '#type' => 'hidden',
+        '#id' => "{$safe_type}-readmore-options",
+        '#prefix' => "<div><div id=\"{$safe_type}-readmore-options\">",
+        '#process' => array('themesettings_dependent_process'),
+        '#dependency' => array("edit-ts-{$safe_type}-readmore-enabled" => array(1)),
+      );
+      $form['readmore'][$type] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Custom settings for %name', array('%name' => $name)),
+      );
+      $form['readmore'][$type]["ts_{$type}_readmore"] = array(
+        '#type'          => 'textfield',
+        '#title'         => t('Link text'),
+        '#default_value' => $settings["ts_{$type}_readmore"],
+        '#description'   => t('HTML is allowed.'),
+      );
+      $form['readmore'][$type]["ts_{$type}_readmore_title"] = array(
+        '#type'          => 'textfield',
+        '#title'         => t('Title text (tool tip)'),
+        '#default_value' => $settings["ts_{$type}_readmore_title"],
+        '#description'   => t('Displayed when hovering over link. Plain text only.'),
+      );
+      $form['readmore'][$type]["ts_{$type}_readmore_prefix"] = array(
+        '#type'          => 'textfield',
+        '#title'         => t('Prefix'),
+        '#default_value' => $settings["ts_{$type}_readmore_prefix"],
+        '#description'   => t('Text or HTML placed before the link.'),
+      );
+      $form['readmore'][$type]["ts_{$type}_readmore_suffix"] = array(
+        '#type'          => 'textfield',
+        '#title'         => t('Suffix'),
+        '#default_value' => $settings["ts_{$type}_readmore_suffix"],
+        '#description'   => t('Text or HTML placed after the link.'),
+      );
+      $form['readmore'][$type]["ts_{$type}_readmore_placement"] = array(
+        '#type'          => 'radios',
+        '#title'         => t('Link placement'),
+        '#default_value' => $settings["ts_{$type}_readmore_placement"],
+        '#options'       => array(
+                              'links'  => t('Add to the links (default)'),
+                              'append' => t('Add a paragraph to the teaser'),
+                              'inline' => t('Add a sentence to the last paragraph of the teaser'),
+                            ),
+      );
+      $form['readmore']["{$type}_div_suffix"] = array(
+        '#value' => '</div></div>',
+      );
+
+      // Comments
+      $form['comment']["ts_{$type}_comment_enabled"] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Enable custom “Comment” link settings for @name', array('@name' => $name)),
+        '#default_value' => $settings["ts_{$type}_comment_enabled"],
+      );
+      $form['comment']["{$type}_div_prefix"] = array(
+        '#type' => 'hidden',
+        '#id' => "{$safe_type}-comment-options",
+        '#prefix' => "<div><div id=\"{$safe_type}-comment-options\">",
+        '#process' => array('themesettings_dependent_process'),
+        '#dependency' => array("edit-ts-{$safe_type}-comment-enabled" => array(1)),
+      );
+      $form['comment'][$type] = array(
+        '#type'        => 'fieldset',
+        '#title'       => t('Custom settings for %name', array('%name' => $name)),
+      );
+      $form['comment'][$type]['teaser'] = array(
+        '#type'        => 'fieldset',
+        '#title'       => t('Links when displaying teaser'),
+        '#collapsible' => TRUE,
+        '#collapsed'   => FALSE,
+      );
+      $form['comment'][$type]['teaser']['add'] = array(
+        '#type'        => 'fieldset',
+        '#title'       => t('“Add new comment” link'),
+        '#description' => t('The link when there are no comments.'),
+        '#collapsible' => TRUE,
+        '#collapsed'   => TRUE,
+      );
+      $form['comment'][$type]['teaser']['add']["ts_{$type}_comment_add"] = array(
+        '#type'          => 'textfield',
+        '#title'         => t('Link text'),
+        '#default_value' => $settings["ts_{$type}_comment_add"],
+        '#description'   => t('HTML is allowed.'),
+      );
+      $form['comment'][$type]['teaser']['add']["ts_{$type}_comment_add_title"] = array(
+        '#type'          => 'textfield',
+        '#title'         => t('Title text (tool tip)'),
+        '#default_value' => $settings["ts_{$type}_comment_add_title"],
+        '#description'   => t('Displayed when hovering over link. Plain text only.'),
+      );
+      $form['comment'][$type]['teaser']['add']['extra'] = array(
+        '#type'        => 'fieldset',
+        '#title'       => t('Options'),
+        '#collapsible' => TRUE,
+        '#collapsed'   => TRUE,
+      );
+      $form['comment'][$type]['teaser']['add']['extra']["ts_{$type}_comment_add_prefix"] = array(
+        '#type'          => 'textfield',
+        '#title'         => t('Prefix'),
+        '#default_value' => $settings["ts_{$type}_comment_add_prefix"],
+        '#description'   => t('Text or HTML placed before the link.'),
+      );
+      $form['comment'][$type]['teaser']['add']['extra']["ts_{$type}_comment_add_suffix"] = array(
+        '#type'          => 'textfield',
+        '#title'         => t('Suffix'),
+        '#default_value' => $settings["ts_{$type}_comment_add_suffix"],
+        '#description'   => t('Text or HTML placed after the link.'),
+      );
+      $form['comment'][$type]['teaser']['add']['extra']["ts_{$type}_comment_add_disable"] = array(
+        '#type'          => 'checkbox',
+        '#title'         => t('Don’t show this link when “Read more” is present'),
+        '#default_value' => $settings["ts_{$type}_comment_add_disable"],
+      );
+      $form['comment'][$type]['teaser']['standard'] = array(
+        '#type'        => 'fieldset',
+        '#title'       => t('“Comments” link'),
+        '#description' => t('The link when there are one or more comments.'),
+        '#collapsible' => TRUE,
+        '#collapsed'   => TRUE,
+      );
+      $form['comment'][$type]['teaser']['standard']["ts_{$type}_comment_singular"] = array(
+        '#type'          => 'textfield',
+        '#title'         => t('Link text when there is 1 comment'),
+        '#default_value' => $settings["ts_{$type}_comment_singular"],
+        '#description'   => t('HTML is allowed.'),
+      );
+      $form['comment'][$type]['teaser']['standard']["ts_{$type}_comment_plural"] = array(
+        '#type'          => 'textfield',
+        '#title'         => t('Link text when there are multiple comments'),
+        '#default_value' => $settings["ts_{$type}_comment_plural"],
+        '#description'   => t('HTML is allowed. @count will be replaced with the number of comments.'),
+      );
+      $form['comment'][$type]['teaser']['standard']["ts_{$type}_comment_title"] = array(
+        '#type'          => 'textfield',
+        '#title'         => t('Title text (tool tip)'),
+        '#default_value' => $settings["ts_{$type}_comment_title"],
+        '#description'   => t('Displayed when hovering over link. Plain text only.'),
+      );
+      $form['comment'][$type]['teaser']['standard']['extra'] = array(
+        '#type'        => 'fieldset',
+        '#title'       => t('Options'),
+        '#collapsible' => TRUE,
+        '#collapsed'   => TRUE,
+      );
+      $form['comment'][$type]['teaser']['standard']['extra']["ts_{$type}_comment_prefix"] = array(
+        '#type'          => 'textfield',
+        '#title'         => t('Prefix'),
+        '#default_value' => $settings["ts_{$type}_comment_prefix"],
+        '#description'   => t('Text or HTML placed before the link.'),
+      );
+      $form['comment'][$type]['teaser']['standard']['extra']["ts_{$type}_comment_suffix"] = array(
+        '#type'          => 'textfield',
+        '#title'         => t('Suffix'),
+        '#default_value' => $settings["ts_{$type}_comment_suffix"],
+        '#description'   => t('Text or HTML placed after the link.'),
+      );
+      $form['comment'][$type]['teaser']['new'] = array(
+        '#type'        => 'fieldset',
+        '#title'       => t('“New comments” link'),
+        '#description' => t('The link when there are one or more new comments.'),
+        '#collapsible' => TRUE,
+        '#collapsed'   => TRUE,
+      );
+      $form['comment'][$type]['teaser']['new']["ts_{$type}_comment_new_singular"] = array(
+        '#type'          => 'textfield',
+        '#title'         => t('Link text when there is 1 new comment'),
+        '#default_value' => $settings["ts_{$type}_comment_new_singular"],
+        '#description'   => t('HTML is allowed.'),
+      );
+      $form['comment'][$type]['teaser']['new']["ts_{$type}_comment_new_plural"] = array(
+        '#type'          => 'textfield',
+        '#title'         => t('Link text when there are multiple new comments'),
+        '#default_value' => $settings["ts_{$type}_comment_new_plural"],
+        '#description'   => t('HTML is allowed. @count will be replaced with the number of comments.'),
+      );
+      $form['comment'][$type]['teaser']['new']["ts_{$type}_comment_new_title"] = array(
+        '#type'          => 'textfield',
+        '#title'         => t('Title text (tool tip)'),
+        '#default_value' => $settings["ts_{$type}_comment_new_title"],
+        '#description'   => t('Displayed when hovering over link. Plain text only.'),
+      );
+      $form['comment'][$type]['teaser']['new']['extra'] = array(
+        '#type'        => 'fieldset',
+        '#title'       => t('Options'),
+        '#collapsible' => TRUE,
+        '#collapsed'   => TRUE,
+      );
+      $form['comment'][$type]['teaser']['new']['extra']["ts_{$type}_comment_new_prefix"] = array(
+        '#type'          => 'textfield',
+        '#title'         => t('Prefix'),
+        '#default_value' => $settings["ts_{$type}_comment_new_prefix"],
+        '#description'   => t('Text or HTML placed before the link.'),
+      );
+      $form['comment'][$type]['teaser']['new']['extra']["ts_{$type}_comment_new_suffix"] = array(
+        '#type'          => 'textfield',
+        '#title'         => t('Suffix'),
+        '#default_value' => $settings["ts_{$type}_comment_new_suffix"],
+        '#description'   => t('Text or HTML placed after the link.'),
+      );
+      $form['comment'][$type]['teaser']["ts_{$type}_comment_teaser_placement"] = array(
+        '#type'          => 'radios',
+        '#title'         => t('Link placement'),
+        '#default_value' => $settings["ts_{$type}_comment_teaser_placement"],
+        '#options'       => array(
+                              'links'   => t('Add to the links (default)'),
+                              'prepend' => t('Prepend to “Read more” link'),
+                              'append'  => t('Append to “Read more” link'),
+                            ),
+      );
+      $form['comment'][$type]['node'] = array(
+        '#type'        => 'fieldset',
+        '#title'       => t('Links when displaying full content'),
+        '#collapsible' => TRUE,
+        '#collapsed'   => FALSE,
+      );
+      $form['comment'][$type]['node']['add'] = array(
+        '#type'        => 'fieldset',
+        '#title'       => t('“Add new comment” link'),
+        '#description' => t('The link when the full content is being displayed.'),
+        '#collapsible' => TRUE,
+        '#collapsed'   => TRUE,
+      );
+      $form['comment'][$type]['node']['add']["ts_{$type}_comment_node"] = array(
+        '#type'          => 'textfield',
+        '#title'         => t('Link text'),
+        '#default_value' => $settings["ts_{$type}_comment_node"],
+        '#description'   => t('HTML is allowed.'),
+      );
+      $form['comment'][$type]['node']['add']["ts_{$type}_comment_node_title"] = array(
+        '#type'          => 'textfield',
+        '#title'         => t('Title text (tool tip)'),
+        '#default_value' => $settings["ts_{$type}_comment_node_title"],
+        '#description'   => t('Displayed when hovering over link. Plain text only.'),
+      );
+      $form['comment'][$type]['node']['add']['extra'] = array(
+        '#type'        => 'fieldset',
+        '#title'       => t('Options'),
+        '#collapsible' => TRUE,
+        '#collapsed'   => TRUE,
+      );
+      $form['comment'][$type]['node']['add']['extra']["ts_{$type}_comment_node_prefix"] = array(
+        '#type'          => 'textfield',
+        '#title'         => t('Prefix'),
+        '#default_value' => $settings["ts_{$type}_comment_node_prefix"],
+        '#description'   => t('Text or HTML placed before the link.'),
+      );
+      $form['comment'][$type]['node']['add']['extra']["ts_{$type}_comment_node_suffix"] = array(
+        '#type'          => 'textfield',
+        '#title'         => t('Suffix'),
+        '#default_value' => $settings["ts_{$type}_comment_node_suffix"],
+        '#description'   => t('Text or HTML placed after the link.'),
+      );
+      $form['comment']["{$type}_div_suffix"] = array(
+        '#value' => '</div></div>',
+      );
+    }
+  }
+}
+
+/**
+ * Implementation of hook_node_type().
+ *
+ * Updates theme settings after a node type change.
+ */
+/*
+function themesettings_node_type($op, $info) {
+  if ($op == 'update' && !empty($info->old_type) && $info->type != $info->old_type) {
+    $old = 'toggle_node_info_'. $info->old_type;
+    $new = 'toggle_node_info_'. $info->type;
+
+    $theme_settings = variable_get('theme_settings', array());
+    if (isset($theme_settings[$old])) {
+      $theme_settings[$new] = $theme_settings[$old];
+      unset($theme_settings[$old]);
+      variable_set('theme_settings', $theme_settings);
+    }
+  }
+}
+*/
+
+/**
+ * Retrieves the basic theme settings defaults.
+ *
+ * @return
+ *   An array of default settings.
+ */
+function &_themesettings_defaults_basic() {
+  $defaults = array(
+    'ts_default_readmore'                 => 'Read more',
+    'ts_default_readmore_title'           => 'Read the rest of this posting.',
+    'ts_default_readmore_prefix'          => '',
+    'ts_default_readmore_suffix'          => '',
+    'ts_default_readmore_placement'       => 'links',
+    'ts_default_comment_singular'         => '1 comment',
+    'ts_default_comment_plural'           => '@count comments',
+    'ts_default_comment_title'            => 'Jump to the first comment of this posting.',
+    'ts_default_comment_prefix'           => '',
+    'ts_default_comment_suffix'           => '',
+    'ts_default_comment_new_singular'     => '1 new comment',
+    'ts_default_comment_new_plural'       => '@count new comments',
+    'ts_default_comment_new_title'        => 'Jump to the first new comment of this posting.',
+    'ts_default_comment_new_prefix'       => '',
+    'ts_default_comment_new_suffix'       => '',
+    'ts_default_comment_add'              => 'Add new comment',
+    'ts_default_comment_add_title'        => 'Add a new comment to this page.',
+    'ts_default_comment_add_prefix'       => '',
+    'ts_default_comment_add_suffix'       => '',
+    'ts_default_comment_add_disable'      => 0,
+    'ts_default_comment_teaser_placement' => 'links',
+    'ts_default_comment_node'             => 'Add new comment',
+    'ts_default_comment_node_title'       => 'Share your thoughts and opinions related to this posting.',
+    'ts_default_comment_node_prefix'      => '',
+    'ts_default_comment_node_suffix'      => '',
+  );
+  return $defaults;
+}
+
+/**
+ * Retrieves the full theme settings defaults, including node-type-specific ones.
+ *
+ * @return
+ *   An array of default settings.
+ */
+function &_themesettings_defaults() {
+
+  $defaults =& _themesettings_defaults_basic();
+
+  // Make the content-type defaults the same as the default theme settings,
+  // so we can tell if content-type-specific settings have been altered.
+  $defaults = array_merge($defaults, variable_get('theme_settings', array()));
+
+  // Set the content-type-specific defaults
+  foreach (node_get_types('names') AS $type => $name) {
+    $defaults["ts_{$type}_readmore_enabled"]         = 0;
+    $defaults["ts_{$type}_readmore"]                 = $defaults['ts_default_readmore'];
+    $defaults["ts_{$type}_readmore_title"]           = $defaults['ts_default_readmore_title'];
+    $defaults["ts_{$type}_readmore_prefix"]          = $defaults['ts_default_readmore_prefix'];
+    $defaults["ts_{$type}_readmore_suffix"]          = $defaults['ts_default_readmore_suffix'];
+    $defaults["ts_{$type}_readmore_placement"]       = $defaults['ts_default_readmore_placement'];
+
+    $defaults["ts_{$type}_comment_enabled"]          = 0;
+    $defaults["ts_{$type}_comment_singular"]         = $defaults['ts_default_comment_singular'];
+    $defaults["ts_{$type}_comment_plural"]           = $defaults['ts_default_comment_plural'];
+    $defaults["ts_{$type}_comment_title"]            = $defaults['ts_default_comment_title'];
+    $defaults["ts_{$type}_comment_prefix"]           = $defaults['ts_default_comment_prefix'];
+    $defaults["ts_{$type}_comment_suffix"]           = $defaults['ts_default_comment_suffix'];
+    $defaults["ts_{$type}_comment_new_singular"]     = $defaults['ts_default_comment_new_singular'];
+    $defaults["ts_{$type}_comment_new_plural"]       = $defaults['ts_default_comment_new_plural'];
+    $defaults["ts_{$type}_comment_new_title"]        = $defaults['ts_default_comment_new_title'];
+    $defaults["ts_{$type}_comment_new_prefix"]       = $defaults['ts_default_comment_new_prefix'];
+    $defaults["ts_{$type}_comment_new_suffix"]       = $defaults['ts_default_comment_new_suffix'];
+    $defaults["ts_{$type}_comment_add"]              = $defaults['ts_default_comment_add'];
+    $defaults["ts_{$type}_comment_add_title"]        = $defaults['ts_default_comment_add_title'];
+    $defaults["ts_{$type}_comment_add_prefix"]       = $defaults['ts_default_comment_add_prefix'];
+    $defaults["ts_{$type}_comment_add_suffix"]       = $defaults['ts_default_comment_add_suffix'];
+    $defaults["ts_{$type}_comment_add_disable"]      = $defaults['ts_default_comment_add_disable'];
+    $defaults["ts_{$type}_comment_teaser_placement"] = $defaults['ts_default_comment_teaser_placement'];
+    $defaults["ts_{$type}_comment_node"]             = $defaults['ts_default_comment_node'];
+    $defaults["ts_{$type}_comment_node_title"]       = $defaults['ts_default_comment_node_title'];
+    $defaults["ts_{$type}_comment_node_prefix"]      = $defaults['ts_default_comment_node_prefix'];
+    $defaults["ts_{$type}_comment_node_suffix"]      = $defaults['ts_default_comment_node_suffix'];
+  }
+  return $defaults;
+}
+
+/**
+ * Retrieves the specified theme settings variable
+ *
+ * @param $var
+ *   The theme key where the settings have been saved.
+ * @return
+ *   An array of settings.
+ */
+function _themesettings_get_settings() {
+  // Get the default-content-type settings
+  $settings =& _themesettings_defaults();
+
+  // Get the theme-specific settings
+  $settings = array_merge($settings, variable_get('theme_settings', array()));
+
+  return $settings;
+}
+
+/**
+ * Creates a link with prefix and suffix text
+ *
+ * @param $prefix
+ *   The text to prefix the link.
+ * @param $suffix
+ *   The text to suffix the link.
+ * @param $text
+ *   The text to be enclosed with the anchor tag.
+ * @param $path
+ *   The Drupal path being linked to, such as "admin/content/node". Can be an external
+ *   or internal URL.
+ *     - If you provide the full URL, it will be considered an
+ *   external URL.
+ *     - If you provide only the path (e.g. "admin/content/node"), it is considered an
+ *   internal link. In this case, it must be a system URL as the url() function
+ *   will generate the alias.
+ * @param $attributes
+ *   An associative array of HTML attributes to apply to the anchor tag.
+ * @param $query
+ *   A query string to append to the link.
+ * @param $fragment
+ *   A fragment identifier (named anchor) to append to the link.
+ * @param $absolute
+ *   Whether to force the output to be an absolute link (beginning with http:).
+ *   Useful for links that will be displayed outside the site, such as in an RSS
+ *   feed.
+ * @return
+ *   an HTML string containing a link to the given path.
+ */
+function _themesettings_link($prefix, $suffix, $text, $path, $attributes = array(), $query = NULL, $fragment = NULL, $absolute = FALSE) {
+  return $prefix
+         . ($text
+            ? l($text,
+                $path,
+                array(
+                  'attributes' => $attributes,
+                  'query' => $query,
+                  'fragment' => $fragment,
+                  'absolute' => $absolute,
+                  'html' => TRUE,
+                )
+              )
+            : ''
+           )
+         . $suffix;
+}
+
+/**
+ * Process callback to add dependency to form items.
+ */
+function themesettings_dependent_process($element, $edit, &$form_state, &$form) {
+  if (isset($element['#dependency'])) {
+    if (!isset($element['#dependency_count'])) {
+      $element['#dependency_count'] = 1;
+    }
+    if (!empty($form_state['ajax'])) {
+      $form_state['js settings']['Themesettings']['dependent'][$element['#id']] = array('num' => $element['#dependency_count'], 'values' => $element['#dependency']);
+    }
+    else {
+      $path = drupal_get_path('module', 'themesettings');
+      drupal_add_js($path .'/dependent.js', 'module', 'header');
+      $options['Themesettings']['dependent'][$element['#id']] = array('num' => $element['#dependency_count'], 'values' => $element['#dependency']);
+      drupal_add_js($options, 'setting');
+    }
+  }
+
+  return $element;
+}

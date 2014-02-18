@@ -1,0 +1,12 @@
+; $Id: random_images.info,v 1.3 2010/02/06 02:04:35 ivansimonov Exp $
+name = "Random Images"
+description = "Enables creation of blocks containing random images uploaded into selected node."
+package = Image
+dependencies[] = upload
+
+; Information added by drupal.org packaging script on 2010-07-18
+version = "6.x-1.1"
+core = "6.x"
+project = "random_images"
+datestamp = "1279462208"
+

@@ -1,0 +1,6 @@
+name = "Augie Duo"
+description = "Custom module for the Drupal 5 to 6 migration"
+package = "Duo"
+core = 6.x
+version = 6.1
+dependencies[] = views

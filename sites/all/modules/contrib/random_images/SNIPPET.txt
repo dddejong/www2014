@@ -1,0 +1,19 @@
+For simple tasks you can use PHP snippet instead of this module.
+Just put it into the new block, configure and upload images.
+<?php
+  // Depends on Upload module
+  $nid= 2;  // Node ID with pictures uploaded
+  $width = 200;  // Desirable picture width
+  global $base_path;
+  $node = node_load($nid);
+  if (count($node->files)>0):
+    $index = array_rand ($node->files);
+    $filename = ($node->files[$index]->filename);
+    $filepath = ($base_path . $node->files[$index]->filepath);
+    $description = ($node->files[$index]->description);
+    print "<center>";
+    print "<img src='$filepath' width ='$width' alt='$filename'><br>";
+    print filter_xss($description, $allowed_tags = array('a', 'em', 'strong', 'cite', 'code', 'ul', 'ol', 'li', 'dl', 'dt', 'dd', 'img', 'br', 'hr' ));
+    print "</center>";
+  endif;
+?>

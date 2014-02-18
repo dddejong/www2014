@@ -1,0 +1,22 @@
+<?php
+// $Id: random_images.install,v 1.3 2010/05/13 22:01:57 ivansimonov Exp $
+
+/**
+ * @file
+ * Install file for the random_images module.
+ */
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function random_images_uninstall() {
+  // Remove variables
+  variable_del('random_images_block_count');
+  for ($i = 1; $i < 10; $i++) {
+    variable_del('random_images_block_node_' . $i);
+    variable_del('random_images_block_size_' . $i);
+    variable_del('random_images_img_count_' . $i);
+  }
+  // Remove records from {blocks} where module='random_images'
+  db_query("DELETE FROM {blocks} WHERE module='random_images'");
+}

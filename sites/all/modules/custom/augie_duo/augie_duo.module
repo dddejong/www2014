@@ -1,0 +1,15 @@
+<?php
+
+function augie_duo_views_pre_view(&$view, &$display_id, $args) {
+  if ($view->name == 'recent_news' && $display_id == 'date_nav_1') {  //
+/*
+    drupal_set_message($view->name);
+    drupal_set_message($display_id);
+    drupal_set_message(print_r($view, true));
+*/
+    
+    $view->date_info->block_identifier = 'mini';
+    
+  }
+}
+?>

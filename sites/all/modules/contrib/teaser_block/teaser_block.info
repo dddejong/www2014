@@ -1,0 +1,10 @@
+name = Teaser block
+description = Allows to create teaser blocks for nodes.
+core = 6.x
+
+; Information added by drupal.org packaging script on 2011-02-25
+version = "6.x-1.x-dev"
+core = "6.x"
+project = "teaser_block"
+datestamp = "1298620372"
+

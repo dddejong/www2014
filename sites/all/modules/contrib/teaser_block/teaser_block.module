@@ -1,0 +1,334 @@
+<?php
+
+/**
+ * @file
+ * Implements teaser blocks for nodes.
+ */
+
+/**
+ * Implementation of hook_perm().
+ */
+function teaser_block_perm() {
+  return array('create teaser blocks');
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function teaser_block_menu() {
+  $items = array();
+  $items['admin/build/block/add-teaser'] = array(
+    'title' => 'Add teaser block',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('teaser_block_form'),
+    'access arguments' => array('create teaser blocks'),
+    'type' => MENU_LOCAL_TASK,
+  );
+  return $items;
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function teaser_block_theme() {
+  return array(
+    'teaser_block_read_more_link' => array(
+      'arguments' => array('data' => NULL),
+    )
+  );
+}
+
+/**
+ * Implementation of hook_block().
+ */
+function teaser_block_block($op = 'list', $delta = 0, $edit = array()) {
+  switch ($op) {
+    case 'list':
+      return teaser_block_list();
+
+    case 'view':
+      return teaser_block_view($delta);
+
+    case 'configure':
+      return teaser_block_form(NULL, $delta);
+
+    case 'save':
+      $form_state = array('values' => $edit);
+      teaser_block_form_submit(NULL, $form_state);
+      break;
+  }
+}
+
+/**
+ * Return a list of teaser blocks for block overview page.
+ */
+function teaser_block_list() {
+  $blocks = array();
+  $result = db_query("SELECT tb.bid, tb.info FROM {teaser_block} tb ORDER BY tb.info");
+  while ($block = db_fetch_object($result)) {
+    $blocks[$block->bid]['info'] = $block->info;
+  }
+  return $blocks;
+}
+
+/**
+ * Return the block requested by $bid.
+ */
+function teaser_block_view($bid) {
+  $sql = 'SELECT t.nid, t.title, t.body, t.format FROM {teaser_block} t INNER JOIN {node} n ON n.nid = t.nid WHERE t.bid = %d AND n.status = 1';
+  if ($data = db_fetch_object(db_query($sql, $bid))) {
+    // Translatable support.
+    if (function_exists('tobject')) {
+      $data = tobject('block', 'teaser_block-'. $bid .'-'. $GLOBALS['theme'], $data);
+    }
+    $block['subject'] = check_plain($data->title);
+    $block['content'] = theme('teaser_block_read_more_link', $data);
+    return $block;
+  }
+}
+
+/**
+ * Return block content including a link to the node.
+ * 
+ * @ingroup themeable
+ */
+function theme_teaser_block_read_more_link($data) {
+  $content = trim(check_markup($data->body, $data->format, FALSE));
+  $link    = '<span class="teaser_block-more-link">';
+  $link   .= l(t('Read more'), 'node/'. $data->nid, array('attributes' => array('title' => t('Read the rest of this posting.')), 'html' => TRUE));
+  $link   .= '</span>';
+  
+  // Insert read more link before an image at the end of block content.
+  $stripped = trim(strip_tags($content));
+  $last_chars = substr($stripped, -60);
+  if (strpos($content, $last_chars) !== FALSE) {
+    $content = preg_replace('/('. preg_quote($last_chars) .')/', '$1'. $link, $content);
+  }
+  // Insert read more link before closing tag.
+  else if (substr($content, -1) == '>') {
+    $content = preg_replace('@(</.+>)$@', $link .'$1', $content);
+  }
+  // Insert read more link at the end.
+  else {
+    $content .= $link;
+  }
+  
+  return $content;
+}
+
+/**
+ * Implementation of hook_form_alter().
+ *
+ * Allows to enable/disable teaser blocks for content-types.
+ */
+function teaser_block_form_alter(&$form, &$form_state, $form_id) {
+  if ($form_id == 'node_type_form' && isset($form['identity']['type'])) {
+    $types = variable_get('teaser_block_types', array());
+    $form['workflow']['teaser_block'] = array(
+      '#type' => 'radios',
+      '#title' => t('Teaser blocks'),
+      '#default_value' => (int)isset($types[$form['#node_type']->type]),
+      '#options' => array(t('Disabled'), t('Enabled')),
+      '#description' => t('Enables teaser blocks for this content-type.'),
+    );
+    array_unshift($form['#submit'], 'teaser_block_node_type_submit');
+  }
+}
+
+/**
+ * Submit handler for node type form.
+ */
+function teaser_block_node_type_submit($form, &$form_state) {
+  $types = variable_get('teaser_block_types', array());
+  if ($form_state['values']['teaser_block']) {
+    $types = array_merge($types, array($form_state['values']['type'] => $form_state['values']['teaser_block']));
+  }
+  else {
+    unset($types[$form_state['values']['type']]);
+  }
+  variable_set('teaser_block_types', $types);
+  unset($form_state['values']['teaser_block']);
+}
+
+function teaser_block_form($form_state, $delta = 0) {
+  $teaser_block = db_fetch_array(db_query('SELECT bid, nid, title, body, format FROM {teaser_block} WHERE bid = %d', $delta));
+
+  $form['delta'] = array(
+    '#type' => 'value',
+    '#value' => $delta,
+  );
+
+  $form['title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Block title'),
+    '#default_value' => $teaser_block['title'],
+    '#description' => t('Enter a title to display for this block or <em>&lt;none&gt;</em> to display no title. Leave empty to use the title of the referenced content.')
+  );
+
+  $options = array('' => t('- Please select -'));
+  $types = variable_get('teaser_block_types', array());
+  $types = (!empty($types) ? "WHERE n.type IN ('". implode("','", array_keys($types)) ."')" : '');
+  $result = db_query(db_rewrite_sql('SELECT n.nid, n.title FROM {node} n '. $types .' ORDER BY n.title'));
+  while ($node = db_fetch_object($result)) {
+    $options[$node->nid] = $node->title;
+  }
+  $form['nid'] = array(
+    '#type' => 'select',
+    '#title' => t('Link <em>read more</em> to'),
+    '#default_value' => $teaser_block['nid'],
+    '#required' => TRUE,
+    '#options' => $options,
+  );
+
+  $form['body'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Teaser text'),
+    '#default_value' => $teaser_block['body'],
+    '#cols' => 60,
+    '#rows' => 10,
+    '#description' => t('Enter a teaser text to display within the block. It will be displayed along with a <em>read more</em> link which links to this content. Leave empty to automatically extract the teaser from this content.')
+  );
+  $form['format'] = filter_form(!empty($teaser_block['format']) ? $teaser_block['format'] : FILTER_FORMAT_DEFAULT, NULL, array('format'));
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save'),
+  );
+  if ($delta) {
+    $form['delete'] = array(
+      '#type' => 'submit',
+      '#value' => t('Delete'),
+    );
+  }
+
+  return $form;
+}
+
+function teaser_block_form_submit($form, &$form_state) {
+  if ($form_state['values']['op'] == t('Save')) {
+    // Insert node title if teaser block title was left empty.
+    if (trim($form_state['values']['title']) == '') {
+      $node = node_load($form_state['values']['nid']);
+      $form_state['values']['title'] = $node->title;
+    }
+    // Insert node teaser if teaser block body was left empty.
+    if (trim($form_state['values']['body']) == '') {
+      $node = node_load($form_state['values']['nid']);
+      $form_state['values']['body'] = node_teaser($node->body);
+    }
+  }
+
+  // Update teaser block in the database.
+  $block = new stdClass;
+  $block->delta = $form_state['values']['delta'];
+  $block->title = $form_state['values']['title'];
+  $block->nid = $form_state['values']['nid'];
+  $block->body = $form_state['values']['body'];
+  $block->format = $form_state['values']['format'];
+  if ($form_state['values']['op'] == t('Save')) {
+    teaser_block_update($block->delta ? 'update' : 'insert', $block);
+  }
+  else if ($form_state['values']['op'] == t('Delete')) {
+    teaser_block_update('delete', $block);
+  }
+
+  $form_state['redirect'] = 'admin/build/block';
+}
+
+/**
+ * Implementation of hook_nodeapi.
+ */
+function teaser_block_nodeapi(&$node, $op, $arg) {
+  switch ($op) {
+    case 'update':
+      teaser_block_update('update status', $node);
+      return;
+
+    case 'delete':
+      // Does not work with #translatable. 09/04/2008 sun
+      // teaser_block_update('delete', $node);
+      return;
+  }
+}
+
+/**
+ * Insert/update a block in the database.
+ */
+function teaser_block_update($op, $block) {
+  global $theme_key;
+  switch ($op) {
+    case 'update':
+      $sql = "UPDATE {teaser_block} SET nid = %d, title = '%s', body = '%s', info = '%s', format = %d WHERE bid = %d";
+      db_query($sql, $block->nid, $block->title, $block->body, _teaser_block_info($block->title, $block->delta), $block->format, $block->delta);
+    
+      drupal_set_message(t('Teaser block %title was updated.', array('%title' => $block->title)));
+      return;
+
+    case 'update status':
+      // Note: $block is a node here.
+      $result = db_query("SELECT tb.bid FROM {teaser_block} tb WHERE tb.nid = %d", $block->nid);
+      $bids = array();
+      while ($item = db_fetch_array($result)) {
+        $bids[] = $item['bid'];
+      }
+      if (!empty($bids)) {
+        db_query("UPDATE {blocks} SET status = %d WHERE module = 'teaser_block' AND delta IN (%s)", $block->status, implode(',', $bids));
+        drupal_set_message(t('Publishing status of teaser block(s) for %title has been updated.', array('%title' => $block->title)));
+      }
+      return;
+
+    case 'insert':
+      $sql = "INSERT INTO {teaser_block} (nid, title, body, info, format) VALUES (%d, '%s', '%s', '%s', %d)";
+      db_query($sql, $block->nid, $block->title, $block->body, _teaser_block_info($block->title, 0), $block->format);
+    
+      $block->delta = db_last_insert_id('teaser_block', 'bid');
+      $sql = "INSERT INTO {blocks} (module, delta, theme) VALUES ('%s', %d, '%s')";
+      db_query($sql, 'teaser_block', $block->delta, $theme_key);
+  
+      drupal_set_message(t('Teaser block %title was created.', array('%title' => $block->title)));
+      return;
+
+    case 'delete':
+      $bids = array();
+      if (!isset($block->delta)) {
+        // Note: $block is a node here.
+        $result = db_query("SELECT tb.bid FROM {teaser_block} tb WHERE tb.nid = %d", $block->nid);
+        while ($item = db_fetch_array($result)) {
+          $bids[] = $item['bid'];
+        }
+      }
+      else {
+        $bids = array($block->delta);
+      }
+      if (!empty($bids)) {
+        db_query("DELETE FROM {blocks} WHERE module = 'teaser_block' AND delta IN (%s)", implode(',', $bids));
+        db_query("DELETE FROM {teaser_block} WHERE bid IN (%s)", implode(',', $bids));
+        drupal_set_message(t('Teaser block(s) for %title have been deleted.', array('%title' => $block->title)));
+      }
+      return;
+  }
+}
+
+/**
+ * Return a unique teaser block description.
+ */
+function _teaser_block_info($title, $bid = 0) {
+  $x = 0;
+  $info = t('Teaser: @title', array('@title' => $title));
+  // Append block counter.
+  while (db_result(db_query("SELECT info FROM {boxes} WHERE bid != %d AND info = '%s'", $bid, $info))) {
+    $info = ($x == 0 ? $info : substr($info, 0, strrpos($info, '#') - 1)) .' #'. ++$x;
+  }
+  return $info;
+}
+
+/**
+ * Implementation of hook_panels_include_directory().
+ */
+function teaser_block_panels_include_directory($plugintype) {
+  switch ($plugintype) {
+    case 'content_types':
+      return $plugintype;
+  }
+}
+

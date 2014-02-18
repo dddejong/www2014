@@ -1,0 +1,109 @@
+	/* AUGUSTANA WEB SITE STYLES FOR FCK EDITOR
+--------------------------------------------------------------------------- */	
+
+/* color palette:
+
+light blue: #ceeoee;
+medium blue: #47638c
+dark blue: ##02866
+gold: #ffd22b
+light gold: #fef2b1
+*/
+
+
+body {
+	font-family:"Helvetica Neue", Helvetica, arial, sans-serif;
+	font-size:12px;
+	line-height:1.5em;
+	color:#000;
+	margin:0;
+	padding:0;
+	background:#fff;
+	}
+	
+
+/* STANDARD ELEMENTS
+--------------------------------------------------------------------------- */	
+	
+img {
+	border:none;
+	}
+
+a, a:link, a:active {
+	color: #47638c;
+	text-decoration:underline;
+	}
+	
+a:visited {
+	color: #323232;
+	}
+	
+a:hover {
+	color:#00274d;
+	}
+	
+h1 { font-size:2em; line-height:1.6em; margin:.3em 0; padding:0; }
+h2 { font-size:1.7em; line-height:1.2em; margin:.2em 0; padding:0; }
+h3 { font-size:1.3em; line-height:1em; margin:.1em 0; padding:0; }
+h4 { font-size:1.2em; line-height:1em; margin:.1em 0; padding:0; }
+h5 { font-size:1.1em; line-height:1em; margin:.1em 0; padding:0; }
+h6 { font-size:1em; line-height:1em; margin:.1em 0; padding:0; }
+
+h3.title,
+h2.title {
+	margin:0 0 1.5em;
+	padding:0;
+	font-size:10px;
+	line-height:1em;
+	font-weight:normal;
+	letter-spacing:.2em;
+	text-transform:uppercase;
+	}
+
+table {
+	border:none;
+	}
+	
+	th {
+		text-align:left;
+		font-weight:bold;
+		}
+		
+	td {
+		padding:5px;
+		margin:0;
+		}
+	
+	tr.odd {
+		background:#efefef;
+		}
+
+
+
+ /* FCK TEMPLATE CSS
+----------------------------------------------- */
+
+.grid-50 {
+	float: left;
+	width: 45%;
+	border: 1px solid #e7e7e7;
+	margin: 1em 1em 1em 0;
+	padding: 1%;
+	}
+
+.clearfix:after {
+	content: ".";
+	display: block;
+	height: 0;
+	font-size: 0;
+	clear: both;
+	visibility: hidden;
+	}
+
+.clearfix {display: inline-block;}
+
+/* Hides from IE5/Mac \*/
+* html .clearfix {height: 1px;}
+.clearfix {display: block;}
+/* End hide from IE5/Mac */	
+

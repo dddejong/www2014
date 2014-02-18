@@ -1,0 +1,9 @@
+<?php
+
+/**
+ * @file
+ * Backlinks provides a view listing all nodes which link to a 
+ * given node ("what links here").   Search module maintains the 
+ * index of node links in its search_node_links database table.  As 
+ * such, this module requires the search and views modules.
+ */

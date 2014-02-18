@@ -1,0 +1,58 @@
+<div id="wrapper">
+<div id="wrapper-shade">
+		
+		<div id="feature">
+		<?php print $channel; ?><h2 id="nav-flag">Choose Your Path</h2>
+		<?php 
+		
+			$menuhtml = home_menu_tree(313);
+			print $menuhtml;
+			?>
+		</div>
+  <!--END FEATURE NAV-->
+		
+		<div id="content" class="clearfix">
+			<div id="main">
+				
+				<div id="leadin">
+					<p class="lead">Augustana College, located in Sioux Falls,  South Dakota, is a selective, private,  residential, comprehensive (liberal arts and professional) college affiliated  with the Evangelical Lutheran Church  in America.  The Augustana experience is anchored by high  standards of <strong>excellence</strong> in the <strong>liberal arts</strong> and is built upon a  foundation of <strong>Christian</strong> values,<strong> community</strong> engagement and <strong>service</strong>.</p>
+			  </div><!--END LEAD IN -->
+				
+				
+				<div class="column">
+					
+					<?php print $homepage_left; ?>
+					
+					</div><!--END COLUMN 1 -->
+				
+				<div class="column">
+					<?php print $homepage_right; ?>
+					
+					
+				</div><!--END COLUMN 2-->
+			</div><!--END MAIN-->
+			
+			<div id="feature-bar">		
+			
+			<?print $right; ?>	
+				<!-- 
+				<ul class="list-features clearfix">
+					<li>
+						<img src="images/temp-240x136.gif" alt="" width="240" height="136" />
+					  <p>The <a href="">Augustana Thought Leader Forum</a> is a catalyst for insightful public discussion.</p>
+				  </li>
+<li>
+						<img src="images/temp-240x136.gif" alt="" width="240" height="136" />
+			<p>The <a href="">Augustana Thought Leader Forum</a> is a catalyst for insightful public discussion.</p>
+				  </li>
+<li class="end">
+						<img src="images/temp-240x136.gif" alt="" width="240" height="136" />
+			<p>The <a href="">Augustana Thought Leader Forum</a> is a catalyst for insightful public discussion.</p>
+				  </li>
+			  </ul>
+			  -->
+			</div><!--END FEATURE BAR-->
+			
+		</div><!--END CONTENT -->
+	</div><!--END WRAPPER SHADE-->
+</div><!--END WRAPPER-->

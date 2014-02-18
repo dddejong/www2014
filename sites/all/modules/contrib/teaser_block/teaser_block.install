@@ -1,0 +1,51 @@
+<?php
+
+/**
+ * Implementation of hook_schema().
+ */
+function teaser_block_schema() {
+  $schema['teaser_block'] = array(
+    'description' => t('Stores user generated teaser blocks for nodes.'),
+    'fields' => array(
+      'bid' => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE,
+        'description' => t('The primary identifier for a teaser block.'),
+      ),
+      'nid' => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0,
+        'description' => t('The linked node id of a teaser block.'),
+      ),
+      'title' => array('type' => 'varchar', 'length' => 64, 'not null' => TRUE, 'default' => '',
+        'description' => t('The title of a teaser block.'),
+      ),
+      'body' => array('type' => 'text', 'size' => 'big',
+        'description' => t('The content of a teaser block.'),
+      ),
+      'info' => array('type' => 'varchar', 'length' => 128, 'not null' => TRUE, 'default' => '',
+        'description' => t('The administrative description of a teaser block.'),
+      ),
+      'format' => array('type' => 'int', 'size' => 'tiny', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0,
+        'description' => t('The input format of a teaser block.'),
+      ),
+    ),
+    'primary key' => array('bid'),
+    'unique keys' => array(
+      'info' => array('info'),
+    ),
+  );
+  return $schema;
+}
+
+/**
+ * Implementation of hook_install().
+ */
+function teaser_block_install() {
+  drupal_install_schema('teaser_block');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function teaser_block_uninstall() {
+  drupal_uninstall_schema('teaser_block');
+  db_query("DELETE FROM {variable} WHERE name LIKE 'teaser_block_%%'");
+}
+ 

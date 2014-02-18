@@ -1,0 +1,28 @@
+
+Teaser block x.x-x.x, xxxx-xx-xx
+--------------------------------
+
+
+Teaser block 6.x-x.x, xxxx-xx-xx
+--------------------------------
+by sun: Fixed PHP filter check in Panels pane preview for Drupal 6.
+by sun: Fixed read more link placed before last character of teaser text.
+#316486 by sun: Added Panels support.
+#310968 by ztyx: Fixed minor PHPdoc block comment.
+#310965 by ztyx: Fixed broken content-type settings forum submit handler.
+#309838 by ztyx: Added Swedish translation.
+#302527 by sun: Ported Teaser block to Drupal 6.x.
+#293013 by ravaka, sun: Fixed missing db table prefix placeholders.
+
+
+Teaser block 5.x-1.1, 2008-04-10
+--------------------------------
+#244717 by sun: Added configurable content-types to limit node selection.
+#244715 by sun: Fixed block properties are untranslatable.
+
+
+Teaser block 5.x-1.0, 2008-04-09
+--------------------------------
+Initial release of Teaser block.
+
+

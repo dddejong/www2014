@@ -1,0 +1,31 @@
+; $Id: duo.info,v 0.1 2010/06/13 23:27:32 goba Exp $
+
+name = Augie Theme
+description = augie.edu theme.
+core = 6.x
+engine = phptemplate
+
+stylesheets[all][] = css/style.css
+stylesheets[all][] = css/style.custom.css
+
+;scripts[] = res/js/jquery.cycle.min.js
+;scripts[] = res/js/jquery.hoverIntent.js
+;scripts[] = res/js/jquery.hideandtype.js
+;scripts[] = res/js/jquery.altpop.js
+;scripts[] = res/js/jquery.homeslider.js
+;scripts[] = res/js/jquery.topsearch.js
+;scripts[] = res/js/jquery.dropdownmenu.js
+;scripts[] = res/js/common.js
+
+;REGIONS
+;
+regions[top] = Top
+regions[bottom] = Bottom
+regions[left] = Left
+regions[right] = Right
+regions[footer] = Header
+regions[search] = Search
+regions[channel] = Channel Image
+regions[gateway] = Gateway Sidebar
+regions[homepage_left] = Homepage Left
+regions[homepage_right] = Homepage Right

@@ -1,0 +1,42 @@
+<?php
+/**
+ * @file
+ * Default theme implementation to wrap menu blocks.
+ *
+ * Available variables:
+ * - $content: The unordered list containing the menu.
+ * - $classes: A string containing the CSS classes for the DIV tag. Includes:
+ *   menu-block-DELTA, menu-name-NAME, parent-mlid-MLID, and menu-level-LEVEL.
+ * - $classes_array: An array containing each of the CSS classes.
+ *
+ * The following variables are provided for contextual information.
+ * - $settings: An array of the block's configuration settings. Includes
+ *   menu_name, parent_mlid, level, follow, depth, expanded, and sort.
+ *
+ * @see template_preprocess_menu_block_wrapper()
+ */
+?>
+<?php
+  $path_url = $_REQUEST['q'];
+  $path_root_array =  explode('/', $path_url);
+  $path_count = count($path_root_array);
+  $path_root = $path_root_array[0];
+
+
+if (
+    ($path_root_array[2] == 'asl-immersion'
+        && $path_root_array[0] == 'academics') ||
+    ($path_root_array[2] == 'midwest-conference-deaf-education'
+        && $path_root_array[0] == 'academics') ||
+    ($path_root_array[2] == 'autism'
+	&& $path_root_array[0] == 'academics') 
+	) {
+    
+    // hide the menu
+  } else {
+
+?>
+<div class="<?php print $classes; ?>">
+  <?php print $content; ?>
+</div>
+<?php } ?>

@@ -1,0 +1,4 @@
+
+Auto Time Zone x.x-x.x, xxxx-xx-xx
+----------------------------------
+#233449 by icarus75: Updated to Drupal 6.

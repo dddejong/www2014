@@ -1,0 +1,13 @@
+<?php
+
+/**
+ * @file
+ * Installation functions.
+ */
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function autotimezone_uninstall() {
+  variable_del('autotimezone_update_guest');
+}

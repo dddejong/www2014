@@ -1,0 +1,216 @@
+<?php
+// $Id: random_images.module,v 1.5 2010/05/13 22:01:57 ivansimonov Exp $
+
+/**
+ * Implementation of hook_perm().
+ */
+function random_images_perm() { 
+  return array('view random images blocks','view random images pages'); 
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function random_images_menu() {
+  $items = array();
+    $items['random_images/%'] = array(
+      'title callback' => 'random_images_title',
+      'title arguments' => array(1),
+      'page callback' => 'random_images_page',
+      'page arguments' => array(1),
+      'access arguments' => array('view random images pages'),
+      'type' => MENU_CALLBACK,
+    );
+  return $items;
+}
+
+function random_images_title($delta = '') {
+  global $theme;
+  $sql = "SELECT title FROM {blocks} WHERE module='random_images' AND delta='%d' AND theme='%s'";
+  $result = db_result(db_query(db_rewrite_sql($sql), $delta, $theme));
+  drupal_set_title(check_plain($result));
+}
+
+/**
+ * Implementation of random_images page.
+ */
+function random_images_page($delta = '') {
+  $delta = (int) $delta;
+  $count = (int) variable_get('random_images_block_count', 1);
+  if (($delta <1) or ($delta > $count)) {
+      return t('No images loaded.');
+  }
+  $page_content = '<br />';
+  $px = intval(variable_get("random_images_block_size_" . $delta, 150));
+  $w = intval($px*1.5) . 'px';
+  $h = intval($px*2) . 'px';
+
+    $nid = (int) variable_get('random_images_block_node_' . $delta, 0);
+    $node = random_images_node_validate(node_load($nid)); //Загрузим сам узел с картинками
+    $files = $node->files;
+  
+  if (count($node->files) > 0) { 
+    shuffle($files);
+    foreach ($files as $key => $value) {
+        $filepath = $value->filepath;
+        $description = $value->description;
+        $page_content .= "<div style='float: left; min-height: $h; height: $h; width: $w;'>";
+        $page_content .= "<center><img src='../$filepath' width=$px> <br />$description<br /></center></div>";
+    }
+  }
+  return $page_content;
+}
+
+/**
+ * Implementation of hook_block().
+ */
+function random_images_block($op='list', $delta=1, $edit=array()) {
+  $count = (int) variable_get('random_images_block_count', 1);
+  if ($delta < 1 or $delta > $count) { 
+    return; 
+  }
+
+  if ($op == 'view') {
+    return random_images_block_view($delta);
+  }
+
+  if ($op == "list") {  //TODO Switch ($op)
+    for ($i = 1; $i <= $count; $i++) {
+      $block[$i]["info"] = t('Random images block ' . $i);
+    }
+    return $block;
+  }
+
+  if ($op == "configure") {
+    $nid = variable_get('random_images_block_node_' . $delta, 0);
+    $node = l("node/$nid", "node/$nid/edit");
+
+    $form['random_images_block_node_' . $delta] = array(
+    '#title' => t('Please specify node number'),
+    '#type' => 'textfield',
+    '#size' => 12,
+    '#maxlength' => 6,
+    '#default_value' => $nid,
+    '#description' => t("Uploaded into $node images will be shown in the block."),
+    );
+
+    $form['random_images_block_size_' . $delta] = array(
+    '#title' => t('Images width'),
+    '#type' => 'textfield',
+    '#size' => 12,
+    '#maxlength' => 3,
+    '#default_value' => variable_get('random_images_block_size_' . $delta, 150),
+    '#description' => t("Width of the images shown in the block."),
+    );
+
+    $form['random_images_img_count_' . $delta] = array(
+    '#title' => t('Images count in the block'),
+    '#type' => 'textfield',
+    '#size' => 12,
+    '#maxlength' => 2,
+    '#default_value' => variable_get('random_images_img_count_' . $delta, 1),
+    '#description' => t("How many images will be shown in the block."),
+    );
+
+    $form['random_images_block_count'] = array(
+    '#title' => t('Random images blocks count'),
+    '#type' => 'textfield',
+    '#size' => 12,
+    '#maxlength' => 1,
+    '#default_value' => $count, //variable_get('random_images_block_count', 1),
+    '#description' => t("Change this value if you want more Random images blocks."),
+    '#suffix' => $ptext,
+    );
+
+    $form['random_images_block_perm'] = array(
+    '#type' => 'item',
+    '#value' => l(t('Edit permissions'), 'admin/user/permissions', array('fragment' => 'module-random_images')),
+    '#description' => t('Image in the block can hyperlink to the special page contains all images of this block. If you want to show this page for users please change permissions.'),
+    );
+    return $form;
+  }
+
+  if ($op == "save") {
+    $var = (int) $edit['random_images_block_count'];
+    if ($var < 1) { $var = 1;}
+    if ($var > 9) { $var = 9;}
+    variable_set('random_images_block_count' , $var);
+
+    $var = (int) $edit['random_images_img_count_' . $delta];
+    if ($var < 1) { $var = 1 ;}
+    variable_set('random_images_img_count_' . $delta, $var);
+
+    $var = (int) $edit['random_images_block_node_' . $delta];
+    if ($var < 0) { $var = 0 ;}
+    variable_set('random_images_block_node_' . $delta, $var);
+
+    $var = (int) $edit['random_images_block_size_' . $delta];
+    if ($var < 1) { $var = 1;}
+    if ($var > 999) { $var = 999;}
+    variable_set('random_images_block_size_' . $delta,  $var);
+  }
+}
+
+/**
+ * Implementation of hook_block() with ($op == 'view').
+ */
+function random_images_block_view($delta=1) {
+
+    if (!user_access('view random images blocks')) { return; } //Если нет прав на просмотр - выход
+
+    $block['subject'] = t('Random images ' . $delta);
+    $block['content'] = l(t('Please select node'), "admin/build/block/configure/random_images/$delta");
+
+    //Определим номер узла, из приложенных файлов которого будет отображена картинка
+    $nid = (int) variable_get('random_images_block_node_' . $delta, 0);  
+    if ($nid > 0) {
+      $node = random_images_node_validate(node_load($nid)); //Загрузим сам узел с картинками
+      $block['content'] .= '<br />' . l(t('or upload images.'), "node/$nid/edit");
+    }
+
+    if (count($node->files) < 1) { // Если нет приложенных файлов
+      if (user_access('administer blocks')) { 
+        return $block; // Покажем сообщение об ошибке
+      } else {
+        return; // Вернем пустой блок
+      }
+    }
+    //Если узел содержит загруженные файлы, то покажем блок
+    global $base_path;
+    // $width = ширина картинки, отображаемой в блоке
+    $width = (int) variable_get('random_images_block_size_' . $delta, 150);
+    // Перемешаем массив с файлами в случайном порядке
+    shuffle($node->files);
+    // Определим количество картинок в блоке
+    $imgcount = (int) variable_get('random_images_img_count_' . $delta, 1);
+    $imgcount = min($imgcount , count($node->files));
+
+    $block['content'] = ''; #"<center>";
+    for ($i = 0; $i < $imgcount; $i++) {
+      $block['content'] .= '<div align="center" style="float:left;">';
+      $obj = each($node->files);
+      $filename = ($obj[1]->filename);
+      $filepath = ($base_path . $obj[1]->filepath);
+      $description = ($obj[1]->description);
+      $title = filter_xss(str_replace ('<', ' <', $description), $allowed_tags = array());
+      $img = "<img src='$filepath' width='$width' alt='$title' title='$title'><br />";
+      if (user_access('view random images pages')) {
+        $block['content'] .= l($img, 'random_images/' . $delta, array('html' => TRUE));
+      } else {
+        $block['content'] .= $img;
+      }
+      $block['content'] .= filter_xss($description, $allowed_tags = array('a', 'em', 'strong', 'cite', 'code', 'ul', 'ol', 'li', 'dl', 'dt', 'dd', 'img', 'br', 'hr'));
+      $block['content'] .= '</div>';
+    }
+    $block['content'] .= '<div style="clear:left;"> </div>';#"</center>";
+    return $block;
+  }
+
+// Оставим только те картинки, которые выводятся в списке файлов узла
+// Удобно временно отключать некоторые картинки просто сняв галочку списка
+function random_images_node_validate($node = array()) {
+  foreach ($node->files as $key => $value) {
+    if ($value->list == 0) unset ($node->files[$key]);
+  }
+  return $node;
+}

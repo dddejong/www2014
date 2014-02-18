@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<title><?php print $head_title ?><?php if ($site_slogan != '' && !$is_front) print ' &ndash; '. $site_slogan; ?></title>
+	<meta http-equiv="content-language" content="<?php // print $language ?>" />
+	<?php //print $meta; ?>
+	<?php print $head; ?>
+	<?php print $styles; ?>
+	<?php print $scripts ?>
+</head>
+
+<body class="<?php print $body_classes; ?>">
+	
+	<div class="testing" style="position: absolute;color:white;background: red;padding:3px 4px"><?php print_r($node->type); ?></div>
+	
+<div id="header">
+  
+  <h1 id="logo"><a href="/">Augustana College</a></h1>
+  
+  <?php // if ($path_root != 'admin') { ?>
+	<ul id="tools">
+		<li><a href="http://events.augie.edu/cgi-bin/publish/webevent.cgi?cmd=opencal&cal=cal3">Calendar</a></li>
+	</ul>
+	
+  <?php echo $search; ?>
+
+  <?php //} ?>
+  <?php print theme('links', $primary_links, array('id' => 'nav')); ?>
+</div> <!--END HEADER -->
+
+
+<div id="wrapper">
+  <div id="wrapper-shade">
+  
+    <div id="titlebar">
+      <h1 class="<?php print $title_class; ?>"><?php print $title_class; ?></h1>
+      <?php
+    if ($breadcrumb != '') {
+      print $breadcrumb;
+    }?>  
+    
+    </div>
+  
+    <div id="content" class="clearfix">
+      
+      
+    <?php  
+    if ($tabs != '') {
+      print '<div class="tabs">'. $tabs .'</div>';
+    }
+    
+    if ($messages != '') {
+      print '<div id="messages">'. $messages .'</div>';
+    }
+    print $content; ?>
+    </div><!--END CONTENT -->
+  </div><!--END WRAPPER SHADE-->
+</div><!--END WRAPPER-->
+
+
+<div id="footer">
+  <div id="footer-bar-right">&nbsp;</div>
+  <div id="footer-bar">
+    <a href="http://www.augie.edu/giving" id="make-a-gift">Make a Gift to Augustana</a>
+    <p>&copy; 2012 Augustana College.  All rights reserved.</p>
+    <p>2001 S. Summit Avenue, Sioux Falls, SD 57197  |  800.727.2844   |    605.274.0770 | +001 605.274.5516 (outside the United States) </p> 
+    <span><a href="/privacy">Privacy Policy</a>   |   <a href="/contact">Contact Augustana</a> | <a href="/about/college-offices-and-affiliates/marketing/connect">Connect with Augustana</a></span>
+  </div>
+</div><!--END FOOTER -->
+
+
+</body>
+<?php print $closure; ?>
+</html>
+
+
+

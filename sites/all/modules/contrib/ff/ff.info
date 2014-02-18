@@ -1,0 +1,11 @@
+; $Id:
+name = Fast Fetch
+description = Fetches data faster than using the standard Drupal API 
+core = 6.x
+package = Other
+; Information added by drupal.org packaging script on 2011-09-28
+version = "6.x-1.1"
+core = "6.x"
+project = "ff"
+datestamp = "1317224204"
+

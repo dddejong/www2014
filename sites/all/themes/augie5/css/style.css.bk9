@@ -1,0 +1,1680 @@
+/* AUGUSTANA WEB SITE STYLES
+--------------------------------------------------------------------------- */	
+
+/* color palette:
+
+light blue: #ceeoee;
+medium blue: #47638c
+dark blue: #002866
+gold: #ffd22b
+light gold: #fef2b1
+barely visible gray: #f4f4f4
+lighter gray: #e7e7e7
+light gray: #cccccc
+*/
+
+
+body {
+	font-family:"Helvetica Neue", Helvetica, arial, sans-serif;
+	font-size:12px;
+	line-height:1.5em;
+	color:#323232;
+	margin:0;
+	padding:0;
+	background:url(../images/bckgrnd.gif) repeat-x left top #cee0ee;
+	}
+
+/* STRUCTURE/LAYOUT
+--------------------------------------------------------------------------- */	
+
+#wrapper { /*gives the left-hand shadow*/
+	width:881px;
+	padding:135px 0 0 7px;
+	background:url(../images/shad-left.png) repeat-y;
+	margin:0 auto;
+	}
+	
+#wrapper #wrapper-shade { /*gives the right-hand shadow*/
+	width:874px;
+	background:url(../images/shad-right.png) repeat-y right top;
+	padding:0 7px 0 0;
+	}
+	
+#wrapper #content {
+	width:854px;
+	background:#fff;
+	padding:13px 0 20px 20px;
+	}
+	
+#wrapper #content #main {
+	float:right;
+	width:600px;
+	margin-bottom:1em;
+	}
+		
+#wrapper #content #main-admin,
+#wrapper #content #main-single, {
+	width:834px;
+	margin-bottom:1em;
+	padding: 20px 0 0 0;
+	}	
+	
+#wrapper #content #main-news {
+	float:left;
+	margin: 0 20px 0 0;
+	width:380px;
+	}	
+
+#wrapper #content #main-news h2 {
+	margin: 0  0 10px 0;
+	}	
+
+#wrapper #content #main-news ul.tabs {
+	margin-right: -230px;
+	}
+
+.front #wrapper #content #main { /*home page only*/
+	float:left;
+	width:600px;
+	}
+	
+	
+/* STANDARD ELEMENTS
+--------------------------------------------------------------------------- */	
+	
+img {
+	border:none;
+	}
+
+a, a:link, a:active {
+	color: #47638c;
+	text-decoration:underline;
+	}
+	
+a:visited {
+	color: #323232;
+	}
+	
+a:hover {
+	color:#00274d;
+	}
+	
+h1 { font-size:2em; line-height:1.6em; margin:.3em 0; padding:0; }
+h2 { font-size:1.7em; line-height:1.2em; margin:.2em 0 .8em 0; padding:0; }
+h3 { font-size:1.3em; line-height:1.2em; margin:.1em 0 .2em 0; padding:0; }
+h4 { font-size:1.2em; line-height:1em; margin:.1em 0; padding:0; }
+h5 { font-size:1.1em; line-height:1em; margin:.1em 0; padding:0; }
+h6 { font-size:1em; line-height:1em; margin:.1em 0; padding:0; }
+
+h3.title,
+h2.title {
+	margin:0 0 2.0em 0;
+	padding:0;
+	font-size:10px;
+	line-height:1em;
+	font-weight:normal;
+	letter-spacing:.2em;
+	text-transform:uppercase;
+	}
+
+
+p {
+	margin: 0 0 12px 0;
+	}
+
+
+
+/* HEADER
+--------------------------------------------------------------------------- */	
+
+#header {
+	position:relative;
+	margin:0 auto;
+	width:888px;
+	}
+	
+h1#logo {
+   background:transparent url(../images/logo.gif) no-repeat scroll;
+   left top;
+   height:135px;
+   left:-50px;
+   margin:0pt;
+   padding:0pt;
+   position:absolute;
+   text-indent:-9999em;
+   width:874px;
+   }
+
+h1#logo a {
+	display:block;
+	text-indent:-9999px;
+    background:transparent url(../images/logo.gif) no-repeat scroll;
+    width: 380px;
+    height: 100px;
+	}
+
+form#site-search {
+	position:absolute;
+	top:50px;
+	right:8px;
+	}
+	
+	form#site-search input#keywords {
+		width:182px;
+		height:24px;
+		border:none;
+		background:url(../images/bck-search-input.gif) no-repeat left top;
+		float:left;
+		display:inline;
+		}
+		
+	form#site-search input#search {
+		width:73px;
+		height:24px;
+		border:none;
+		text-indent:-9999em;
+		background:url(../images/bttn-search.gif) no-repeat left top;
+		float:left;
+		display:inline;
+		}
+		
+form#google-cse-searchbox-form {
+	position:absolute;
+	top:50px;
+	right:8px;
+	}
+	
+	form#google-cse-searchbox-form input#edit-query {
+		width:182px;
+		height:24px;
+		border:none;
+		background:url(../images/bck-search-input.gif) no-repeat left top;
+		float:left;
+		display:inline;
+		padding: 3px 0 0 0;
+		}
+		
+	form#google-cse-searchbox-form input#edit-sa {
+		width:73px;
+		height:24px;
+		border:none;
+		text-indent:-9999em;
+		background:url(../images/bttn-search.gif) no-repeat left top;
+		float:left;
+		display:inline;
+		padding-top:40px; overflow:hidden;
+		}
+
+form#google-cse-searchbox-form div {
+	margin: 0;
+	padding: 0;
+	line-height: 0;
+	}
+	
+form#google-cse-searchbox-form input.form-text {
+  border: none;
+  padding: 0;
+	}
+
+form#google-cse-results-searchbox-form {
+	margin: 0 0 0 0;
+	}
+
+form#google-cse-results-searchbox-form input#edit-query {
+  border: 1px solid #ccc;
+  padding: 0;
+  height:20px;
+	}
+
+ul#tools {
+	list-style:none;
+	margin:0;
+	padding:0;
+	position:absolute;
+	top:50px;
+	right:270px;
+	}
+	
+	ul#tools li {
+		display:inline;
+		color:#fff;
+		font-size:11px;
+		padding:0 10px 0 0;
+		margin:0 auto;
+		}
+		
+		ul#tools li.li-cap{
+			border:none;
+			}
+			
+		ul#tools li a {
+			color:#fff;
+			text-decoration: underline;
+			}
+		
+			
+/* PRIMARY (TOP) NAVIGATION
+--------------------------------------------------------------------------- */	
+		
+ul#nav {
+	list-style:none;
+	margin:0 auto;
+	padding:0 10px;
+	position:absolute;
+	width:854px;
+	height:39px;
+	top:93px;
+	left:7px;
+	text-align:center;
+	background:#47638c;
+	border-top:3px solid #e1ce5a;
+	}
+	
+	ul#nav li {
+		display:inline;
+		color:#fff;
+		font-size:14px;
+		line-height:40px;
+		padding:0 10px;
+		margin:0 auto;
+		border-right:1px solid #fff;
+		}
+		
+		ul#nav li.last {
+			border:none;
+			}
+			
+		ul#nav li a {
+			color:#fff;
+			text-decoration: none;
+			}
+			
+		ul#nav li a:hover,
+		ul#nav li a.here {
+			text-decoration: underline;
+			}
+			
+
+/* HOME PAGE STYLES
+--------------------------------------------------------------------------- */	
+			
+/* Home Page > Photo and Audience Nav
+--------------------------------------------------------------------------- */	
+
+#wrapper #feature { /*feature photo and choose your path nav*/
+ background-color: #FFFFFF;
+ height:376px;
+ padding-top:10px;
+ position:relative;
+ margin: 0;
+ width: 874px;
+ text-align: right;
+ }
+
+ #wrapper #feature h2#nav-flag { /*choose your path image*/
+ background:url(../images/choose-your-path.gif) no-repeat;
+ position:absolute;
+ bottom:54px;
+ left:36px;
+ width:155px;
+ height:26px;
+ padding:0;
+ margin:0;
+ text-align: left;
+ text-indent:-9999em;
+ }
+
+ #wrapper #feature ul#feature-nav { /*choose your path nav*/
+ background:url(../images/bck-nav.gif) no-repeat left bottom #ffd126;
+ height:54px;
+ list-style:none;
+ margin: -6px 0 0 20px;
+ overflow:hidden;
+ padding:0;
+ text-align:center;
+ width:854px;
+ }
+
+ #wrapper #feature ul#feature-nav li {
+  display:inline;
+  padding-left: 0;
+  padding-right:10px;
+  margin-right:7px;
+  border-right:1px solid #1d394e;
+  font-size:18px;
+  line-height:54px;
+  }	
+			
+		#wrapper #feature ul#feature-nav li.last {
+			border:none;
+			padding-right:0;
+			margin-right:0;
+			}
+			
+			#wrapper #feature ul#feature-nav li a {
+				text-decoration: none;
+				color: #00274D;
+				}
+				
+			#wrapper #feature ul#feature-nav li a:visited {
+				color: #00274D;
+				}
+				
+			#wrapper #feature ul#feature-nav li a:hover {
+				text-decoration: underline;
+				}
+			
+/* Home Page > News/Events (left side)
+--------------------------------------------------------------------------- */	
+
+#wrapper #content #main div.column {
+	width:270px;
+	padding-right:30px;
+	float:left;
+	}
+	
+	#wrapper #content #main div.column h3 {
+		margin:0 0 .5em 0;
+		padding:0;
+		line-height: 150%;
+		}
+	#wrapper #content #main	
+	#wrapper #content #main div.column p {
+		margin:0 0 .5em 0;
+		padding:0;
+		}
+		
+	#wrapper #content #main div.column div.post-meta {
+		font-size:11px;
+		text-transform:uppercase;
+		color:#aeaeae;
+		margin-bottom:10px;
+		}
+		
+	#wrapper #content #main div.column a.more {
+		padding:4px 5px;
+		background:#e5eefa;
+		}
+
+#wrapper div.content p,
+#wrapper ul.list-features,
+#wrapper div.content li {
+padding-right:30px;
+}
+
+#wrapper ul.list-features {
+padding-right:30px;
+}
+
+
+
+
+/* Home Page > Features/Ads (right side)
+--------------------------------------------------------------------------- */	
+
+#wrapper #content #feature-bar { /*used on the front page*/
+	float:right;
+	width:240px;
+	text-align:left;
+	}
+			
+#wrapper #content #feature-bar ul {
+	margin:0;
+	padding:0;
+	list-style:none;
+	}
+
+#wrapper #content #feature-bar ul li {
+	}
+	
+#wrapper #content #feature-bar ul li h5 {
+	line-height: 140%;
+	padding: 0 10px 0 0;
+	margin: 0;
+	}
+
+#wrapper #content #feature-bar ul li p {
+	margin: 2px 0 1.5em 0;
+	padding:0 10px 0 0;
+	text-align:left;
+	}
+
+#wrapper #content #feature-bar ul li p a {
+	font-weight:bold;
+	}
+			
+
+/* SECTION AND CONTENT PAGE STYLES
+--------------------------------------------------------------------------- */	
+
+/* Section/Content Page > Title Bar
+--------------------------------------------------------------------------- */	
+	
+#wrapper #titlebar { /*used for section fronts*/
+	padding-top:10px;
+	background:#fff;
+	}
+
+	#wrapper #titlebar h1 {
+		margin:0 0 0 20px;
+		padding:0;
+		height:69px;
+		text-indent:-9999em;
+		}
+		
+	#wrapper #titlebar h1.about {
+		background:url(../images/titles/about.gif) no-repeat right top #ffffff;
+		}
+	
+	#wrapper #titlebar h1.privacy {
+		background:url(../images/titles/about.gif) no-repeat right top #ffffff;
+		}
+		
+	#wrapper #titlebar h1.contact {
+		background:url(../images/titles/about.gif) no-repeat right top #ffffff;
+		}
+
+	#wrapper #titlebar h1.academics {
+		background:url(../images/titles/academics.gif) no-repeat right top #ffffff;
+		}
+		
+	#wrapper #titlebar h1.admission {
+		background:url(../images/titles/admission.gif) no-repeat right top #ffffff;
+		}
+		
+	#wrapper #titlebar h1.arts {
+		background:url(../images/titles/arts.gif) no-repeat right top #ffffff;
+		}
+		
+	#wrapper #titlebar h1.campuslife {
+		background:url(../images/titles/campuslife.gif) no-repeat right top #ffffff;
+		}
+		
+	#wrapper #titlebar h1.giving {
+		background:url(../images/titles/giving.gif) no-repeat right top #ffffff;
+		}
+		
+	#wrapper #titlebar h1.news {
+		background:url(../images/titles/news.gif) no-repeat right top #ffffff;
+		}
+		#wrapper #titlebar h1.events {
+		background:url(../images/titles/news.gif) no-repeat right top #ffffff;
+		}	
+		#wrapper #titlebar h1.in-the-news {
+		background:url(../images/titles/news.gif) no-repeat right top #ffffff;
+		}	
+	#wrapper #titlebar h1.alumni {
+		background:url(../images/titles/alumni.gif) no-repeat right top #ffffff;
+		}
+		
+	#wrapper #titlebar h1.students {
+		background:url(../images/titles/currentstudents.gif) no-repeat right top #ffffff;
+		}
+	
+	#wrapper #titlebar h1.parents {
+		background:url(../images/titles/parents.gif) no-repeat right top #ffffff;
+		}
+	
+	#wrapper #titlebar h1.prospective {
+		background:url(../images/titles/prospectivestudents.gif) no-repeat right top #ffffff;
+		}
+	
+	#wrapper #titlebar h1.facstaff {
+		background:url(../images/titles/facultyandstaff.gif) no-repeat right top #ffffff;
+		}
+		
+	#wrapper #titlebar h1.community {
+		background:url(../images/titles/churchandcommunity.gif) no-repeat right top #ffffff;
+		}
+	#wrapper #titlebar h1.photos {
+		background:url(../images/titles/campuslife.gif) no-repeat right top #ffffff;
+		}	
+		
+	#wrapper #titlebar h1.alerts {
+		background:url(../images/titles/alerts.gif) no-repeat right top #ffffff;
+		}
+
+	#wrapper #titlebar h1.node {
+		background:url(../images/titles/node.gif) no-repeat right top #ffffff;
+		}
+		
+#wrapper #titlebar img {
+	margin: 0 0 0 20px;
+	}
+			
+/* Section/Content Page > Section Navigation
+--------------------------------------------------------------------------- */	
+
+#wrapper #content #sidebar {
+	float:left;
+	width:220px;
+	padding: 0 20px 0 0;
+	}
+
+#wrapper #content #sidebar h2 {
+	font-size: 15px;
+	text-transform: uppercase;
+	}
+	
+#wrapper #content #sidebar a {
+	text-decoration: none;
+	}
+	
+	#wrapper #content #sidebar ul { /*first level*/
+		margin:0 0 8px 0;
+		padding:0 0 30px 0;
+		list-style:none;
+		background-image: none;
+		list-style-image: none;
+		list-style-type:none;
+		}
+	
+	#wrapper #content #sidebar ul.side-nav li.expanded ul li.here {
+		border: none;
+		}
+	
+	#wrapper #content #sidebar ul.side-nav {
+		}
+		
+		#wrapper #content #sidebar ul.side-nav li {
+			background-image: none;
+			border-bottom:1px solid #ececec;
+			font-size:14px;
+			font-weight:bold;
+			padding:0;
+			margin:0 0 10px 0;
+			list-style:none;
+			list-style-image: none;
+			list-style-type:none;
+			line-height:1.2em;
+			}
+			
+			#wrapper #content #sidebar ul.side-nav li a {
+				padding: 5px;
+				/*background:#e5eefa;*/
+				display:block;
+				color:#002866;
+				}
+				
+			#wrapper #content #sidebar ul.side-nav li a:hover {
+				background:#002866;
+				color:#fff;
+				}
+				
+			#wrapper #content #sidebar ul.side-nav li.here {
+				border: none;
+				}
+				
+			#wrapper #content #sidebar ul.side-nav li.here a {
+				padding:5px;
+				background:#002866;
+				color:#fff;
+				}
+				
+			#wrapper #content #sidebar ul.side-nav li.here ul {  /*second level*/
+				margin:0 0 0 8px;
+				padding:0;
+				}
+				
+				#wrapper #content #sidebar ul.side-nav li.here ul li {
+					font-size:12px;
+					text-align:left;
+					padding:5px 0 0 0;
+					margin:0 0 0 20px;
+					}
+					
+					#wrapper #content #sidebar ul.side-nav li.here ul li a {
+						background:#fff;
+						color:#002866;
+						}
+						
+					#wrapper #content #sidebar ul.side-nav li.here ul li a:hover {
+						background:#002866;
+						color:#fff;
+						}
+						
+						
+					#wrapper #content #sidebar ul.side-nav li.here ul li.here.highlight a {
+						background:#FFFFFF;
+						color:#000;
+						/* border-bottom:1px solid #ececec; */
+						}
+					
+					#wrapper #content #sidebar ul.side-nav li.here ul li.here a {
+						background:#FFFFFF;
+						color:#000;
+						border-bottom:1px solid #ececec;
+						}
+					
+					#wrapper #content #sidebar ul.side-nav li.here ul li.li-cap-bttm a {
+						background:#fff;
+						color:#002866;
+						border:none;
+						}
+						
+					#wrapper #content #sidebar ul.side-nav li.here ul li.li-cap-bttm a:hover {
+						background:#002866;
+						color:#fff;
+						}
+						
+						#wrapper #content #sidebar ul.side-nav li.here ul li.here ul { /*third level*/
+							padding:0 0 0 30px;
+							margin:0;
+							}
+							
+							#wrapper #content #sidebar ul.side-nav li.here ul li.here ul li {
+								font-size:12px;
+								font-weight:normal;
+								padding:5px 0;
+								margin:5px 0;
+								line-height: 1.5em;
+								}
+								
+								#wrapper #content #sidebar ul.side-nav li.here ul li.here ul li a {
+									/*background:#fff1bd;*/
+									background:#fff;
+									border:none;
+									color:#40381d;
+									display:inline;
+									padding:3px;
+									}
+									
+								#wrapper #content #sidebar ul.side-nav li.here ul li.here ul li a:hover {
+									background:#002866;
+									color:#fff;
+									}
+									
+								#wrapper #content #sidebar ul.side-nav li.here ul li.here ul li.here {
+									border-bottom:1px solid #ececec;
+									}
+									
+									#wrapper #content #sidebar ul.side-nav li.here ul li.here ul li.here a {
+										/*background:#002866;*/
+										color:#000;
+										font-weight: bold;
+										}
+									#wrapper #content #sidebar ul.side-nav li.here ul li.here ul li.here a:hover {
+									    background:#fff;
+										color:#000;
+										font-weight: bold;
+										}
+/* 4th level */
+
+#wrapper #content #sidebar ul.side-nav li.here ul li.here ul li.here a {
+        border-bottom: solid 1px #ececec;
+	display: block;          
+        }
+
+#wrapper #content #sidebar ul.side-nav li.here ul li.here ul li.here ul li {
+        border: none;
+	padding: 0;
+        }
+
+#wrapper #content #sidebar ul.side-nav li.here ul li.here ul li.here ul li a {
+	border: none;
+	}	
+
+					#wrapper #content #sidebar ul.side-nav ul ul li a {
+						border-bottom: 0;
+						background: pink;
+						}
+						
+						
+				
+		#wrapper #content #sidebar ul.secondary-nav li { /*choose your path nav*/
+			font-size:12px;
+			line-height:1.7em;
+			padding:5px 0;
+			margin:0;
+			list-style:none;
+			background-image: none;
+			list-style-image: none;
+			list-style-type:none;
+			}
+			
+			#wrapper #content #sidebar ul.secondary-nav li a {
+				padding:0 5px;
+				display:block;
+				/*background:#fff1bd;*/
+				color:#40381d;
+				border-bottom:1px solid #ececec;
+				}
+				
+				#wrapper #content #sidebar ul.secondary-nav li a.visited {
+				padding:0 5px;
+				display:block;
+				/*background:#fff1bd;*/
+				color:#40381d;
+				border-bottom:1px solid #ececec;
+				}
+				
+				#wrapper #content #sidebar ul.secondary-nav li a:hover {
+				background: #FEEEAF;
+				border-bottom:1px solid #FEEEAF;
+				}
+				
+				#wrapper #content #sidebar ul.secondary-nav li.here a {
+				background: #FEEEAF;
+				border-bottom:1px solid #FEEEAF;
+				}
+				
+				
+/* Section/Content Page > Lead in paragraph
+--------------------------------------------------------------------------- */	
+
+#wrapper #content #main .lead {
+	border-bottom:1px solid #aeaeae;
+	font-size:16px;
+	line-height:28px;
+	margin:0 10px 1.5em 0;
+	padding:0 0 .5em 0;
+	}
+
+
+/* Section/Content Page > Items of interest
+--------------------------------------------------------------------------- */	
+
+#wrapper #content #main ul.list-features {
+	margin:0 0 1.5em 0;
+	padding:0 0 1.5em 0;
+	border-bottom:1px solid #aeaeae;
+	list-style:none;
+	}
+	
+#wrapper #content #main ul.list-features li {
+	margin:0 15px 0 0;
+	padding:0;
+	display:inline;
+	float:left;
+	width:190px;
+	}
+	
+#wrapper #content #main ul.list-features li.end {
+	margin:0;
+	}
+	
+	#wrapper #content #main ul.list-features li h5 {
+		margin:0;
+		padding:0;
+		font-size:12px;
+		line-height:1.5em;
+		}
+	#wrapper #content #main ul.list-features li p {
+		margin:0;
+		padding:0;
+		font-size:12px;
+		line-height:1.5em;
+		}
+		
+		#wrapper #content #main ul.list-features li.end p {
+		padding:0 5px 0 0;
+		}
+
+/* Section/Content Page > Standard content blocks
+--------------------------------------------------------------------------- */	
+
+#wrapper #content #main div.entry { /*used for independent content blocks*/
+	border-bottom:1px solid #aeaeae;
+	margin-bottom:1.5em;
+	}
+	
+#wrapper #content #main blockquote {
+	background-color: #CEE0EE;
+	float: right;
+	font-size: 16px;
+	font-style:italic;
+	line-height: 200%;
+	padding: 20px;
+	margin: 0 0 10px 10px;
+	width: 300px;
+	}
+	
+#wrapper #content #main div.entry .imageWide {
+	margin: 0 0 20px 0;
+	}
+
+#wrapper #content #main div.entry .imageFloatLeft {
+	float: left;
+	margin: 20px 20px 10px 0;
+	width: 300px;
+	}
+	
+	#wrapper #content #main div.entry .left {
+		float: left;
+		margin: 20px 20px 10px 0;
+		}
+
+#wrapper #content #main div.entry .imageFloatRight {
+	float: right;
+	margin: 20px 0 10px 20px;
+	width: 300px;
+	}
+	
+	#wrapper #content #main div.entry .right {
+		float: right;
+		margin: 20px 0 10px 20px;
+		}
+		
+#wrapper #content #main table {
+		border: none;
+		margin: 10px 0 20px 0;
+		width: 90%;}
+		
+	#wrapper #content #main table thead {
+		}
+		
+	#wrapper #content #main  table th {
+			font-weight:bold;
+			padding:0 3px 3px 0;
+			text-align:left;
+			}
+	
+	#wrapper #content #main  table.system-status-report th, #wrapper #content #main  table.system-status-report tr.merge-up td {
+  		padding-left: 30px;
+	}	
+			
+	#wrapper #content #main table tbody {
+		border: 0;
+		}
+			
+	#wrapper #content #main  table	td {
+			padding:5px;
+			margin:0;
+			}
+		
+	#wrapper #content #main table tr.odd {
+			background:#efefef;
+			}
+	
+#wrapper #content #main .caption {
+	font-size:12px;
+	line-height:14px;
+	padding:.5em 0;
+	margin:0;
+	}
+
+#wrapper #content #main-news a {
+	text-decoration: underline;
+	}
+
+#wrapper #content #main .dateline,
+#wrapper #content #main-news .dateline { 
+	font-size:11px;
+	text-transform:uppercase;
+	color:#aeaeae;
+	margin: 0 0 2px 0;
+	}
+	
+#wrapper #content #main .dateline-event,
+#wrapper #content #main-news .dateline-event { 
+	margin: 10px 0 10px 0;
+	}
+
+#wrapper #content #main .dateline-event span.item,
+#wrapper #content #main-news .dateline-event span.item { 
+	text-transform:uppercase;
+	color:#000;
+	font-weight: bold;
+	margin: 10px 0 10px 0;
+	}
+
+#wrapper #content #main table tbody {
+	border: 0;
+	}
+
+
+/* Section/Content Page > Profiles
+--------------------------------------------------------------------------- */	
+
+#wrapper #content #main ul.list-profiles {
+	margin:0 0 1.5em 0;
+	padding:0 0 1.5em 0;
+	border-bottom:1px solid #aeaeae;
+	list-style:none;
+	}
+	
+#wrapper #content #main ul.list-profiles li {
+	margin:0;
+	padding:0 2%;
+	display:inline;
+	float:left;
+	width:20%;
+	font-size:11px;
+	text-align:center;
+	}
+	
+#wrapper #content #main ul.list-profiles li img {
+	border:1px solid #aeaeae;
+	margin: 0 0 10px 0;
+	}
+	
+#wrapper #content #main ul.list-profiles li p {
+	margin: 0;
+	line-height:1.5em;
+	}
+	
+
+/* Section/Content Page > Faculty listing
+--------------------------------------------------------------------------- */	
+
+#wrapper #content #main .vcard {
+	border-bottom:1px solid #aeaeae;
+	font-size:12px;
+	line-height:18px;
+	margin: 10px 0 20px 0;
+	}
+
+#wrapper #content #main .vcard img {
+	border:1px solid #aeaeae;
+	float:left;
+	margin:0 20px 20px 0;
+	}
+	
+#wrapper #content #main .vcard .personal-info {
+	float:left;
+	margin:0 0 20px 0;
+	}
+	
+#wrapper #content #main .vcard .fn {
+	text-transform:uppercase;
+	font-size:13px;
+	font-weight:bold;
+	}
+
+/* Section/Content Page > Forms
+--------------------------------------------------------------------------- */	
+
+#wrapper #content #main form {
+	border-bottom:1px solid #aeaeae;
+	margin: 0 20px 0 1.5em 0;}
+	
+#wrapper #content #main form fieldset {
+	border: solid 1px #aeaeae;
+	margin: 0 20px 12px 0;
+	padding: .5em;
+	}	
+
+#wrapper #content #main form fieldset fieldset {
+	margin: 0 0 6px 160px;
+	width: 200px;
+	}
+
+#wrapper #content #main form fieldset legend {
+	color: #000000;
+	font-weight: bold;
+	font-size: 1.0em;
+	padding: 0 5px;
+	}
+
+#wrapper #content #main form fieldset fieldset legend {
+	color: #000000;
+	font-size: .9em;
+	}
+	
+#wrapper #content #main form div { /* use around each question/answer set */
+	margin: 6px 0;
+	}
+
+#wrapper #content #main form div.fieldsetNotes {  /* use after legend or within form for form instructions */
+	margin: 0
+	}
+	
+#wrapper #content #main form div.fieldsetNotes p {
+	margin: 0;
+	}
+	
+#wrapper #content #main form div p.fieldNotes { /* use directly after field for field instructions */
+	margin: 5px 0 0 160px;
+	font-size: smaller;
+	font-style: italic;
+	}
+	
+#wrapper #content #main form div.comments { /* use for comments/questions textarea */
+	}
+	
+#wrapper #content #main form div.options {
+	margin: 0 0 0 160px;
+	}
+	
+#wrapper #content #main form div.options ul {
+	margin: 0;
+	padding: 0;
+	}
+	
+#wrapper #content #main form div.options ul li {
+	list-style-type: none;
+	}
+
+#wrapper #content #main form div.options ul.oneLine li {
+	float: left;
+	}
+	
+#wrapper #content #main form fieldset fieldset div.options {
+	margin: 0;
+	}
+	
+#wrapper #content #main form div.submit {
+	}
+		
+#wrapper #content #main form div label {
+	float: left;
+	margin: 0 10px 0 0;
+	text-align: right;
+	width: 150px;
+	}
+
+#wrapper #content #main form div.comments label {
+	display: block;
+	float: none;
+	margin: 0 0 3px 0;
+	text-align: left;
+	width: 100%;
+	}
+
+#wrapper #content #main form div.options label {
+	float: none;
+	margin: 0 5px 0 0;
+	text-align: left;
+	width: auto;
+	}
+
+#wrapper #content #main form div input,
+#wrapper #content #main form div select {
+	width: 200px;
+	}
+
+#wrapper #content #main form div textarea {
+	width: 350px;
+	}
+
+#wrapper #content #main form div input.form-radio,
+#wrapper #content #main form div input.form-checkbox {
+	width: 20px;
+	}
+
+#wrapper #content #main  form.inline-form div input {
+	width: auto;
+	}
+
+.webform-component-select {
+	float: none;
+	clear: both;
+	width: 100%;
+	display: block;
+	border: 0px solid pink;
+	}
+	
+.webform-component-textfield {
+		clear: both;
+	} 
+#wrapper #content #main form div .webform-component-select label {
+	float: none;
+	margin: 0;
+	}
+
+#wrapper #content #main form div.comments textarea {
+	width: 360px;
+	}
+
+#wrapper #content #main form div.options input.inputCheckbox,
+#wrapper #content #main form div.options input.inputRadio {
+	width: 14px
+	}
+		
+#wrapper #content #main form div.submit input.inputSubmit {
+		width:73px;
+		height:24px;
+		border:none;
+		text-indent:-9999em;
+		background:url(../images/bttn-submit.gif) no-repeat left top;
+		float:left;
+		display:inline;
+		margin: 0 0 20px 0;
+		}
+
+
+/* FOOTER
+----------------------------------------------- */
+	
+	#footer {
+		width:889px;
+		height:8px;
+		margin:0 auto;
+		color: #47638c;
+		font-size:.9em;
+		}
+		
+		#footer #footer-bar {
+			float:left;
+			position:relative;
+			width:868px;
+			padding:16px 0 3em 8px;
+			background:url(../images/shad-bottom.gif) no-repeat;
+			}
+			
+			#footer #footer-bar #make-a-gift {
+				position:absolute;
+				top:0;
+				right:0px; 
+				width:234px;
+				height:26px;
+				background:url(../images/make-a-gift.gif) no-repeat;
+				text-indent:-9999em;
+				}
+					
+			#footer #footer-bar p {
+				margin:0;
+				}
+				
+			#footer #footer-bar a {
+				color:#47638c;
+				text-decoration:underline;
+				}
+				
+		#footer #footer-bar-right {
+			float:right;
+			width:13px;
+			height:8px;
+			background:url(../images/shad-bottom-right.gif) no-repeat;
+			overflow:hidden;
+			}					
+				
+/* GATEWAY STUFF
+----------------------------------------------- */
+
+#wrapper #content #sidebar .gateway h3 {
+	margin: 0 0 12px 0;
+	}
+
+#wrapper #content #sidebar .gateway .entry {
+	border-bottom:1px solid #aeaeae;
+	margin-bottom:1.5em;
+	}
+
+#wrapper #content #sidebar .gateway ul {
+	margin: 0 0 18px 12px;
+	padding: 0;
+	}
+
+#wrapper #content #sidebar .gateway ul li {
+	font-size: 11px;
+	line-height: 150%;
+	list-style-type:disc;
+	background-image: none;
+	list-style-image: none;
+	margin: 0 0 0 12px;
+	padding: 0;
+	}
+
+#wrapper #content #main .view-content-links-resources .item-list {
+	float: left;
+	width: 48%;
+	margin: 0 1em 12px 0;
+	}
+	
+/* MISC.
+----------------------------------------------- */
+			
+.clearfix:after {
+	content: ".";
+	display: block;
+	height: 0;
+	font-size: 0;
+	clear: both;
+	visibility: hidden;
+	}
+
+.clearfix {display: inline-block;}
+
+/* Hides from IE5/Mac \*/
+* html .clearfix {height: 1px;}
+.clearfix {display: block;}
+/* End hide from IE5/Mac */	
+
+.tabs {
+ 	margin: 0 0 1.5em 0;
+ 	}
+   .tabs li a:link {
+ 		background:#f4f4f4;
+ 		}
+
+  	.tabs li a:visited {
+ 		background:#f4f4f4;
+ 		}
+    .tabs li a:hover {
+ 		background:#e7e7e7;
+ 		}
+ 
+ .tabs ul.tabs {
+ 	margin-bottom: 1em;
+ 	}
+
+/* SOME NECESSARY DRUPAL DEFAULTS 
+----------------------------------------------- */
+
+.breadcrumb {
+	margin: 10px 0 0 20px;
+	padding: 0 2px 0 2px;
+	}
+	
+div.messages {
+  margin-bottom: 1.5em;
+  padding: 0.68em;
+  font-weight: bold;
+  }
+
+div.messages.success {
+  border: 1px solid #7AC142;
+  color: #55872E;
+  background: #F1F8EB;
+  margin-right: 1em;
+  }
+
+div.messages ul {
+  margin-bottom: 0;
+  }
+
+div.help {
+  background: #ffc;
+  padding: 0.75em; /* fix alignment of help text */
+  margin-bottom: 1.5em;
+  border: 1px solid #ccc;
+  }
+
+ /* CUSTOM DRUPAL CSS
+----------------------------------------------- */
+img.title_image {
+	margin: 0 0 6px 0;
+	}
+	
+h3 a, 
+h3 a:link, 
+h3 a:active,
+h3 a:visited {
+	text-decoration:none;
+	}
+	
+#wrapper #content #main h3 a {
+	text-decoration: underline;
+	}
+
+.admin-right {
+	text-align: right;
+	padding: 0 1em 0 0;
+	}
+
+.tip {
+	color: #ccc;
+	}
+
+#wrapper #content #main div.entry p {
+	padding-right:30px;
+}
+
+div.read-more {
+	margin: -.5em 0 1em 0;
+	}
+
+
+
+/* cancel out default css for list views */
+
+.view-content-channel-image .item-list ul,
+.view-content-channel-image .item-list li,
+.view-content-channel-image .item-list img,
+.view-content-top-stories .item-list ul,
+.view-content-top-stories .item-list li,
+.view-content-top-events .item-list ul,
+.view-content-top-events .item-list li,
+.view-content-news .item-list ul,
+.view-content-news .item-list li,
+.view-content-events .item-list ul,
+.view-content-events .item-list li,
+.view-content-home-stories .item-list ul,
+.view-content-home-stories .item-list li,
+.view-content-home-events .item-list ul,
+.view-content-home-events .item-list li
+	{
+	margin: 0 0 0 0;
+	padding: 0;
+	list-style:none;
+	background-image: none;
+	list-style-image: none;
+	list-style-type:none;
+}
+
+.view-content-archive .item-list li
+	{
+	font-size: 10px;
+	line-height: 150%;
+	list-style-type:none;
+	background-image: none;
+	list-style-image: none;
+	margin: 0 0 0 12px;
+	padding: 0;
+	}
+
+.view-content-homepage-ads .item-list ul {
+	margin-bottom: 2em;
+	}
+	
+.view-content-homepage-ads .item-list li
+	{
+	margin: 0 0 1em 0;
+	padding: 0;
+	list-style:none;
+	background-image: none;
+	list-style-image: none;
+	list-style-type:none;
+	}
+
+.view-content-channel-image .item-list li
+	{
+	margin: 0 0 0 0;
+	padding: 0;
+	list-style:none;
+	background-image: none;
+	list-style-image: none;
+	list-style-type:none;
+	}
+
+.news_full { 
+	float: right;
+	padding: 0 8px 0 8px;
+}
+
+.news_thumb { 
+	float: left;
+	padding: 0 8px 0 0;
+}
+
+.unpublished {
+	background: pink;
+	border: 1px solid #ccc;
+	width: auto;
+	margin: 0 5px 10px 0;
+	padding: 1em;
+	}
+
+#top-stories, #top-events {
+	background: #fef2b1;
+	padding: 10px;
+	margin: 0 0 1em 0;
+	}
+
+#top-stories h2, #top-events h2 {
+	background: #ffd22b;
+	color: #002866;
+	padding: 5px;
+	}
+
+#event-details {
+	background: #fef2b1;
+	padding: 10px;
+	margin: 0 0 1em 0;
+	width: 300px;
+	}
+	
+.nodequeue-table {
+	width: 100%;
+	}
+
+span.edit-small {
+	font-size: 11px;
+	font-weight: normal;
+	}
+
+ /* CUSTOM WEB FORMS
+ 
+----------------------------------------------- */
+#wrapper #content #main form fieldset.webform-component-fieldset {
+	float: left;
+	border: solid 1px #e7e7e7;
+	padding: .5em;
+	width: 46%;
+	margin: 0 10px 1em 0;
+	background: #f4f4f4;
+	}	
+	
+#wrapper #content #main form fieldset.webform-component-fieldset legend {
+	visibility: hidden;
+	display: none;
+	}	
+
+#wrapper #content #main form div label {
+
+	margin: 0 0 0 0;
+	text-align: left;
+	
+	}
+	
+#edit-submitbutton {
+	display: block;
+	width: 100%;
+	clear: both;
+	}
+	
+ /* CUSTOM SIDEBAR
+----------------------------------------------- */
+
+#side {
+	background-color: #CEE0EE; 
+	float:right; 
+	padding: 10px; 
+	width: 180px;
+	margin-top: 0em;
+	}
+#side ul li {
+	margin: 0 0 2em 0;
+	}
+
+#side .view-summary-archive ul li {
+	margin: 0 0 5px 0;
+	}
+
+#side h3 {
+	margin: 0 0 5px 0;
+	}
+	
+ /* FCK TEMPLATE CSS
+----------------------------------------------- */
+
+.grid-50 {
+	float: left;
+	width: 49%;
+	border: 1px solid #e7e7e7;
+	}
+
+ /* PHOTO GALLERIES
+----------------------------------------------- */
+
+.gallery { 
+	background: #e7e7e7;
+	border: 1px solid #ccc;
+	padding: 1em;
+	clear: both;
+	}
+
+.gallery-thumb {
+	float: left;
+	width: 210px;
+	}
+
+.gallery-desc {
+	float: left;
+	width: 340px;
+	padding: 1em;
+	}
+
+
+.view-gallery {
+	clear: both;
+	margin: 2em 0 0 0;
+	}
+
+.view-album-tags {
+	clear: both;
+	margin: 1.2em 0 0 0;
+	}
+
+#wrapper #content #main .view-content-gallery ul li { /*choose your path nav*/
+			border: 0px solid #ccc;
+			padding:0em;
+			margin:0 0 1em 0;
+			list-style:none;
+			background-image: none;
+			list-style-image: none;
+			list-style-type:none;
+			}
+
+
+.view-content-album-tags tbody {
+  	border-top: 0;
+	}
+
+
+ 	
+.view-photo-galleries table tr td {
+  text-align: center;
+  padding: 0 0 1em 0;
+ }
+
+.view-photo-galleries img {
+ 
+  padding: 0 0 1em 0;
+ }
+ 
+#lightbox {
+  	text-align: left;
+	}
+
+#imageData #caption {
+  	font-weight: normal;
+	}	
+
+#imageData #imageDetails {
+	text-align: left;
+	}
+
+.img_title {
+	font-weight: bold;
+	}
+	
+#numberDisplay {
+	color: #666;
+	}
+.view-photo-galleries {
+  margin-left:6em;
+ 	}
+
+/* custom CSS for Visit Evaluation Form */
+
+#wrapper #content #main form#visiteval input {
+	width: 125px;
+}
+
+#wrapper #content #main form#visiteval div input {
+ 	width: 75px;
+}
+
+/* CSS for Outside Scholarship Report form */
+
+#wrapper #content #main form#webform-client-form-3360 div fieldset.webform-component-fieldset {
+	width: 520px;
+	background-color: white;
+	border: none;
+}
+
+/* CSS for Junior Visit Day form */
+
+#wrapper #content #main form#webform-client-form-3442 div fieldset.webform-component-fieldset {
+	width: 520px;
+	background-color: white;
+	border: none;
+}
+
+/* CSS for Summer Visit Day form */
+
+#wrapper #content #main form div fieldset#webform-component-sumvis {
+	width: 520px;
+	background-color: white;
+	border: none;
+}
+
+#wrapper #content #main form div.webform-component-select label {
+	width: 400px;
+}
+
+/* CSS for Standard Student Housing forms */
+
+#wrapper #content #main form div fieldset#webform-component-studenthousing1 {
+	width: 520px;
+	background-color: white;
+	border: none;
+}
+
+#wrapper #content #main form div fieldset#webform-component-studenthousing1 input,select {
+	margin: 10px auto;
+}
+
+
+#wrapper #content #main form div fieldset#webform-component-studenthousing1 div.description {
+	margin-bottom: 20px;
+	border-bottom: solid 1px black;
+}
+
+/* CSS for Standard Admission forms */
+
+#wrapper #content #main form div fieldset#webform-component-admissionstd {
+        width: 520px;
+        background-color: white;
+        border: none;
+}
+
+#wrapper #content #main form div fieldset#webform-component-admissionstd input,select {
+        margin: 10px auto;
+}
+
+
+#wrapper #content #main form div fieldset#webform-component-admissionstd div.description {
+        margin-bottom: 20px;
+        border-bottom: solid 1px black;
+}
+
+#wrapper #content #main form div fieldset#webform-component-admissionstd .webform-component-date select {
+	width: 70px;
+}
+
+#wrapper #content #main form div fieldset#webform-component-admissionstd .webform-component-time select {
+        width: 70px;
+}
+
+#wrapper #content #main form div fieldset#webform-component-admissionstd .webform-component-time label.option {
+	float: right;
+	position: relative;
+}
+
+#wrapper #content #main form div fieldset#webform-component-admissionstd .webform-component-time div.form-radios {
+	padding: 0;
+}
+
+/* Home Page > Alert 
+ * --------------------------------------------------------------------------- */	
+
+#wrapper #feature #alert-img {
+  position: absolute;
+  bottom: 114px;
+  left: 177px;
+  width: 500px;
+  height: auto;
+  margin: 30px 50px;
+  background-color: #000000;
+  border: 1px solid #ffffff;
+  /* for IE */
+  filter:alpha(opacity=80);
+  /* CSS3 standard */
+  opacity:0.8;
+  color: #ffffff;
+}
+
+

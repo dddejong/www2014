@@ -1,0 +1,71 @@
+form#site-search {
+	position:absolute;
+	top:50px;
+	right:8px;
+	}
+	
+	form#site-search input#keywords {
+		width:182px;
+		height:24px;
+		border:none;
+		background:url(../images/bck-search-input.gif) no-repeat left top;
+		float:left;
+		display:inline;
+		}
+		
+	form#site-search input#search {
+		width:73px;
+		height:24px;
+		border:none;
+		text-indent:-9999em;
+		background:url(../images/bttn-search.gif) no-repeat left top;
+		float:left;
+		display:inline;
+		}
+		
+form#google-cse-searchbox-form {
+	position:absolute;
+	top:50px;
+	right:8px;
+	}
+	
+	form#google-cse-searchbox-form input#edit-query {
+		width:182px;
+		height:21px;
+		border:none;
+		background:url(../images/bck-search-input.gif) no-repeat left top;
+		float:left;
+		display:inline;
+		padding: 3px 0 0 0;
+		}
+		
+	form#google-cse-searchbox-form input#edit-sa {
+		width:73px;
+		height:24px;
+		border:none;
+		text-indent:-9999em;
+		background:url(../images/bttn-search.gif) no-repeat left top;
+		float:left;
+		display:block;
+		}
+
+form#google-cse-searchbox-form div {
+	margin: 0;
+	padding: 0;
+	line-height: 0;
+	}
+	
+form#google-cse-searchbox-form input.form-text {
+  border: none;
+  padding: 0;
+}
+
+form#google-cse-results-searchbox-form {
+	margin: 0 0 0 0;
+	}
+
+form#google-cse-results-searchbox-form input#edit-query {
+  border: 1px solid #ccc;
+  padding: 0;
+  height:20px;
+}

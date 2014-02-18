@@ -1,0 +1,18 @@
+/* put IE hacks in here */
+
+#wrapper,
+
+#wrapper #wrapper-shade {
+background:none;
+}
+
+/* fix for homepage gateway nav */
+
+#wrapper #feature ul li {
+	margin: 0 0 -3px 0;
+	}
+ 
+#wrapper #content #sidebar ul.side-nav li.here {
+	border: 1px solid #fff;
+	}
+
